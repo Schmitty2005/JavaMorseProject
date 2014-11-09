@@ -1,12 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/*MorsePlayerPackage
+ * Package Description 
  */
 package morseplayer;
 
+
 /**
- *
+ *This is a description.
  * @author bill
  */
 import javax.sound.sampled.*;
@@ -30,9 +29,21 @@ class MorseTiming extends Sound_Timing{
 	 
  }
 
-
+/**Class Descripition added right before class
+ */
 class MorsePlayer {
-	private int frequency = 800;
+/**MorsePlayer Class is used to playback morse code.  
+ * Strings and Characters are played back at a speed determined in words per minute
+ * 
+ * @param frequency is the frequency of the tone that is desired
+ * @param wordsPerMinute is the speed in words per minute.  Default is 15 WPM
+ * @param farnsworthSpacing determines is farnsworth spacing will be used.
+ * @param charToPlay is used to play a single character in morse code.
+ * @param stringToPlay is used to play a word or sentence in morse code.
+ * 
+* 
+*/
+    private int frequency = 800;
 	private int wordsPerMinute = 15;
 	private boolean farnsworthSpacing = false;
 	private char charToPlay;
