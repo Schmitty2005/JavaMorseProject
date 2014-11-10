@@ -10,6 +10,7 @@ package morseplayer;
  */
 import javax.sound.sampled.*;
 import java.io.*;
+import sun.font.TrueTypeFont;
 
 
 /* class Sound_Timing is used to hold variables for creation of morse
@@ -43,6 +44,19 @@ class MorsePlayer {
  * 
 * 
 */
+ class elementSpacing extends Sound_Timing{
+
+        public elementSpacing(int wpm, int farnsWPM, boolean use_farnsworth) {
+            super(wpm, farnsWPM, use_farnsworth);
+        }
+ 
+ };
+        
+ 
+
+
+
+
     private int frequency = 800;
 	private int wordsPerMinute = 15;
 	private boolean farnsworthSpacing = false;
