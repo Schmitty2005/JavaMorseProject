@@ -10,6 +10,7 @@ package morseplayer;
  */
 import javax.sound.sampled.*;
 import java.io.*;
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import sun.font.TrueTypeFont;
 
 
@@ -51,9 +52,6 @@ class MorsePlayer {
         }
  
  };
-        
- 
-
 
 
 
@@ -61,7 +59,7 @@ class MorsePlayer {
 	private int wordsPerMinute = 15;
 	private boolean farnsworthSpacing = false;
 	private char charToPlay;
-	private String wordToPlay = null;
+	private String wordToPlay;
 	
 	
 	MorsePlayer (int WPM){
@@ -79,18 +77,16 @@ class MorsePlayer {
 	}
 	MorsePlayer (boolean use_farnsworth){
 		this.farnsworthSpacing = use_farnsworth;
+	}	
+	private void playDit ()
+        {
+            System.out.println("Beep    -   Dit beep");
+            //TODO code to play dit sound
 	}
-	public static void main (String [] args){
-	//TODO main code....initialize sounds (create waveforms)
-	}
-	
-	
-	
-	private void playDih (){
-	//TODO code to play dih sound
-	}
-	private void playDah () {
-		//TODO code to play dah sound
+	private void playDah ()
+        {
+            System.out.println("Beeeeeep - Dah beep");
+            //TODO code to play dah sound
 	}
 	public void playChar (char characterToPlay){
 	
@@ -99,5 +95,19 @@ class MorsePlayer {
 	public void playWord (String WordtoPlay){
 		//TODO code to play string in morse	
 	}
+      public static void main (String [] args){
+//This line below properly initialised a new class of Sound_Timing! YAY!            
+Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
+//These are testing lines
+double poop = soundDurations.dit_length;
+double crap = soundDurations.dah_length;
+double wpm = soundDurations.interWordSpacing;
+boolean farnsBool = soundDurations.farnsworthSpacing;
+double bullshit = soundDurations.farnsworthWPM;
+    
+          
+//Testing lines end here.....
+//TODO main code....initialize sounds (create waveforms)
+	}  
 }
 	
