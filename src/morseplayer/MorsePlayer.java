@@ -11,25 +11,7 @@ package morseplayer;
 import javax.sound.sampled.*;
 import java.io.*;
 import jdk.nashorn.internal.codegen.CompilerConstants;
-import sun.font.TrueTypeFont;
-
-
-/* class Sound_Timing is used to hold variables for creation of morse
- * 
- * This class is basically an enum that holds the values assosiated with the timing of dit's and dah's
- *@author
- *Brian S.
- *@version 
- *Alpha
- */
-class DecodeMorse extends MorseDictionary{}
-
-
-class MorseTiming extends Sound_Timing{
-	//TODO explanation is the class needs to be private for MorsePlayer.  No need to be public in Morse_Player class
-	//Morse_Player class
-	 
- }
+//import sun.font.TrueTypeFont; //WTF??? How did this get in?
 
 /**Class Descripition added right before class
  */
@@ -45,16 +27,19 @@ class MorsePlayer {
  * 
 * 
 */
-  //This line below properly initialised a new class of Sound_Timing! YAY!            
-    Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
-    MorseDictionary DecodeDictionary = new MorseDictionary();  
+            
+Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
+MorseDictionary DecodeDictionary = new MorseDictionary();  
     
-    private int frequency = 800;
-	private int wordsPerMinute = 15;
-	private boolean farnsworthSpacing = false;
-	private char charToPlay;
-	private String wordToPlay;
-	
+private int frequency = 800;
+private int wordsPerMinute = 15;
+private boolean farnsworthSpacing = false;
+private char charToPlay;
+private String wordToPlay;
+
+        MorsePlayer() {
+            //Default Constructor
+        }
 	
 	MorsePlayer (int WPM){
 		this.wordsPerMinute = WPM;
@@ -65,10 +50,12 @@ class MorsePlayer {
 		this.farnsworthSpacing = use_farnsworth;
 		this.frequency = freq_hz;
 	}
+        
 	MorsePlayer (int WPM, double freq_hz){
 		this.frequency = (int)freq_hz;
                 this.wordsPerMinute = WPM;
 	}
+        
 	MorsePlayer (boolean use_farnsworth){
 		this.farnsworthSpacing = use_farnsworth;
 	}	
@@ -101,12 +88,25 @@ class MorsePlayer {
                         playDah();
                         }
             index++;
-            }
-//TODO code to play morse character
+            }  //TODO code to play morse character --finished 11/10/2014
 	}
-	public void playWord (String WordtoPlay){
-		//TODO code to play string in morse	
+        
+	public void playWord (String wordToPlay)
+        {
+            int stringLength = wordToPlay.length();
+            String wordToPlayLowerCase = wordToPlay.toLowerCase();
+            int index = 0;
+            
+            while (index < stringLength)
+            {
+                char charToPlay = wordToPlayLowerCase.charAt(index);
+                playChar(charToPlay);
+                System.out.println("===================");
+                index ++;
+            //TODO remember to add code that accounts for spacing between words!
+            }//TODO code to play string in morse	
 	}
+        
       public static void main (String [] args){
 
     //String poop = DecodeDictionary.morseDictionary.get ("a");
@@ -115,15 +115,8 @@ class MorsePlayer {
 
 //These are testing lines
 /*
-    double this.poop = soundDurations.dit_length;
-double crap = soundDurations.dah_length;
-double wpm = soundDurations.interWordSpacing;
-boolean farnsBool = soundDurations.farnsworthSpacing;
-double bullshit = soundDurations.farnsworthWPM;
-*/
-        playDit();
-          playDah();
           
+          */
 //Testing lines end here.....
 //TODO main code....initialize sounds (create waveforms)
 	}  
