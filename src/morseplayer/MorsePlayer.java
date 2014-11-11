@@ -45,16 +45,10 @@ class MorsePlayer {
  * 
 * 
 */
- class elementSpacing extends Sound_Timing{
-
-        public elementSpacing(int wpm, int farnsWPM, boolean use_farnsworth) {
-            super(wpm, farnsWPM, use_farnsworth);
-        }
- 
- };
-
-
-
+  //This line below properly initialised a new class of Sound_Timing! YAY!            
+    Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
+    MorseDictionary DecodeDictionary = new MorseDictionary();  
+    
     private int frequency = 800;
 	private int wordsPerMinute = 15;
 	private boolean farnsworthSpacing = false;
@@ -78,33 +72,57 @@ class MorsePlayer {
 	MorsePlayer (boolean use_farnsworth){
 		this.farnsworthSpacing = use_farnsworth;
 	}	
-	private void playDit ()
+	
+        private static void playDit ()
         {
-            System.out.println("Beep    -   Dit beep");
+            System.out.println("Beep     - Dit beep");
             //TODO code to play dit sound
 	}
-	private void playDah ()
+	private static void playDah ()
         {
             System.out.println("Beeeeeep - Dah beep");
             //TODO code to play dah sound
 	}
 	public void playChar (char characterToPlay){
-	
+            //TODO for some reason, Dictionary was not working properly....may need '' instead of ""
+            String morseString = DecodeDictionary.morseDictionary.get (characterToPlay);
+            //String morseString = "...-.-";
+            int index = 0;
+            int stringLength = morseString.length();
+            while ( index < stringLength)
+            {
+                char morseElement = morseString.charAt(index);
+                    if (morseElement == '.')
+                        {
+                         playDit();
+                        }
+                    else if(morseElement == '-') 
+                        {
+                        playDah();
+                        }
+            index++;
+            }
 //TODO code to play morse character
 	}
 	public void playWord (String WordtoPlay){
 		//TODO code to play string in morse	
 	}
       public static void main (String [] args){
-//This line below properly initialised a new class of Sound_Timing! YAY!            
-Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
+
+    //String poop = DecodeDictionary.morseDictionary.get ("a");
+    
+
+
 //These are testing lines
-double poop = soundDurations.dit_length;
+/*
+    double this.poop = soundDurations.dit_length;
 double crap = soundDurations.dah_length;
 double wpm = soundDurations.interWordSpacing;
 boolean farnsBool = soundDurations.farnsworthSpacing;
 double bullshit = soundDurations.farnsworthWPM;
-    
+*/
+        playDit();
+          playDah();
           
 //Testing lines end here.....
 //TODO main code....initialize sounds (create waveforms)
