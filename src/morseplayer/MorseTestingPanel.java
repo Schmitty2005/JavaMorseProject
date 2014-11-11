@@ -1,3 +1,6 @@
+//TODO  DELETE THIS PANEL!  
+//==============================================================================
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -14,6 +17,7 @@ public class MorseTestingPanel extends javax.swing.JPanel {
     /**
      * Creates new form MorseTestingPanel
      */
+    MorsePlayer mplayer = new MorsePlayer(800);
     public MorseTestingPanel() {
         initComponents();
     }
@@ -36,6 +40,11 @@ public class MorseTestingPanel extends javax.swing.JPanel {
 
         jPlayDit.setText("Play Dit");
         jPlayDit.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPlayDit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPlayDitActionPerformed(evt);
+            }
+        });
 
         jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton2.setLabel("Play Dah");
@@ -110,6 +119,11 @@ public class MorseTestingPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
 
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jPlayDitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPlayDitActionPerformed
+       mplayer.playChar('h');
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPlayDitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
