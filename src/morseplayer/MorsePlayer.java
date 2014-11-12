@@ -31,7 +31,6 @@ class MorseTiming extends Sound_Timing{
 
 /**Class Descripition added right before class
  */
-class MorsePlayer {
 /**MorsePlayer Class is used to playback morse code.  
  * Strings and Characters are played back at a speed determined in words per minute
  * 
@@ -43,6 +42,12 @@ class MorsePlayer {
  * 
 * 
 */
+class MorsePlayer {
+
+
+    /** frequency is the desired freq in hertz of the tone
+     * 
+     */
     private int frequency = 800;
 	private int wordsPerMinute = 15;
 	private boolean farnsworthSpacing = false;
