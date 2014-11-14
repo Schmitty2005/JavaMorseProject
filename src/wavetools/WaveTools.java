@@ -13,7 +13,11 @@ import java.math.BigDecimal;
  *
  * @author Brian S
  */
-
+/**
+ * A class for creating and manipulating waves U
+ * Used in MorsePlayer.class
+ * @author brian_000
+ */
 public class WaveTools {
 public double sampleRate = 44100;
 public int channels = 1; //currently only supports on channel. Maybe Later 
@@ -27,6 +31,14 @@ public double volume = 27040; // just set a volume for now.
     }
 }
     // remove static after testing!
+    /**
+     * Generates a sine wave based on 3 simple parameters.
+     * @param freq  The desired frequency of the tone
+     * @param msDuration The total duration of the tone in milli seconds.
+     * @param msRamp The time in milliseconds of the desired volume ramp.
+     * @return AudioInputStream
+     */
+    
     public static AudioInputStream createSineWave_PCM (int freq, int msDuration, int msRamp)
     {
 //ByteArrayInputStream waveStream = new ByteArrayInputStream(byte[]);
@@ -62,12 +74,17 @@ catch (IOException e)
 {
 
 };
+
+
 int testInt = createdStream.size();
 System.out.println(testInt);
 System.out.println(createdStream.toString());
 
 //TODO No way to easily switch InputSteam to OutputStream.;
 //TODO code for creating a sine wave and storing in a stream
+//TODO  This code below converts a byte array to an input Stream.  SIMPLE!
+byte[] decodedBytes = null;
+InputStream is = new ByteArrayInputStream(decodedBytes);
         return modifiedStream;
     }
     public AudioInputStream createHahnWindow (int durationMilliSecs, boolean atBegining, boolean atEnding)
@@ -76,16 +93,64 @@ System.out.println(createdStream.toString());
         //TODO code for modifiying existing values in a wave/PCM for a hahn window
     return modifiedStream = null;
     }
+    public static ByteArrayInputStream convertOutToInStream (OutputStream outStream)
+    {
+        
+       //TODO  May not need this function.  Just use ByteArray instead of stream!
+        InputStream poopbutt;
+        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+        
+        String testString = "this is a teststring! ";
+        int hashtest = testString.hashCode();
+        System.out.println(hashtest);
+        
+        byte [] poopbyte ;
+        poopbyte = byteOutStream.toByteArray();
+        ByteArrayInputStream byteInStream = new ByteArrayInputStream(poopbyte);
+        //TODO code for buffered transfer of streams.
+        
+        return byteInStream;
+        
+        
+    }
+    
+   public byte[] createSinePCM (short freq, short duration_ms, short ramp_ms, short sampleRate){
+   
+       byte [] bytePCMsine = null;
+       
+       
+       
+       return bytePCMsine;
+   
+   }
+   /**
+    * 
+    * @param duration_ms
+    * @param sampleRate
+    * @return 
+    */
+   public static byte[] createSilencePCM (int duration_ms, int sampleRate)
+   {
+       byte [] bytePCMsilence = new byte[(duration_ms/1000 * sampleRate)];
+  
+       for (int slice =0; slice < (sampleRate/(duration_ms*0.01)); slice++)
+       {
+       bytePCMsilence [slice] = 0 ;
+       }
+       return bytePCMsilence;
+   }
     /**
      * @param args No command line arguments available in class.
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        byte[] pooptest=createSilencePCM(1000, 44100);
+        System.out.print(pooptest[2]);
         
-        createSineWave_PCM(800, 1000, 5);
+        //createSineWave_PCM(800, 1000, 5);
     }
     
-}
+    }
 /*WORKING CODE FROM MY VB.NET PROJECT
 Function createWave(ByRef genStream As MemoryStream, ByVal frequency As Double, ByVal msDuration As Integer, _
 Optional ByVal msTrailingSilence As Integer = 0, Optional msRamp As Integer = 4, Optional ByVal volume As UInt16 = 16383) ' 16383
