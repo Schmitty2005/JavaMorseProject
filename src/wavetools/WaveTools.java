@@ -8,14 +8,8 @@ package wavetools;
 import java.io.*;
 import javax.sound.sampled.*;
 import java.math.BigDecimal;
-//import jdk.internal.org.xml.sax.InputSource;
 /**
- *
- * @author Brian S
- */
-/**
- * A class for creating and manipulating waves U
- * Used in MorsePlayer.class
+ * WaveTools library for working with wave files and to use in MorsePlayer library
  * @author brian_000
  */
 public class WaveTools {
@@ -38,19 +32,11 @@ public double volume = 27040; // just set a volume for now.
      * @param msRamp The time in milliseconds of the desired volume ramp.
      * @return AudioInputStream
      */
-    
     public static AudioInputStream createSineWave_PCM (int freq, int msDuration, int msRamp)
     {
-//ByteArrayInputStream waveStream = new ByteArrayInputStream(byte[]);
-
-AudioInputStream  modifiedStream = null;
-//This is the creation of the stream.  Output Streams allow .write() method.
-ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-DataOutputStream createdStream = new DataOutputStream(byteOutput);
-
 //TODO check to make sure variables are now correct
-final double  TAU  = 2 * Math.PI;
-int msTrailingSilence = 0;
+final   double  TAU  = 2 * Math.PI;
+int     msTrailingSilence = 0;
 int     formatChunkSize  = 16;
 int     headerSize  = 8;
 short   formatType = 1;
@@ -67,61 +53,25 @@ double      silenceSamples = samplesPerSecond * msTrailingSilence * 0.001;
 int     dataChunkSize  = (int)(total_samples * 2) + (int)(silenceSamples * 2) ;//'frameSize --- changed 1 to 2 5/28/14
 int     fileSize = 36 + dataChunkSize ;//'waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize
 //this is a test to write to the stream!
-try{
-createdStream.writeDouble(234234);
-}
-catch (IOException e) 
-{
-
-};
 
 
-int testInt = createdStream.size();
-System.out.println(testInt);
-System.out.println(createdStream.toString());
-
-//TODO No way to easily switch InputSteam to OutputStream.;
 //TODO code for creating a sine wave and storing in a stream
 //TODO  This code below converts a byte array to an input Stream.  SIMPLE!
-byte[] decodedBytes = null;
-InputStream is = new ByteArrayInputStream(decodedBytes);
-        return modifiedStream;
+return null;
     }
     public AudioInputStream createHahnWindow (int durationMilliSecs, boolean atBegining, boolean atEnding)
     {
-        AudioInputStream modifiedStream;
+        //TODO code will be changed to byte[] instead of AudioInputStream!
         //TODO code for modifiying existing values in a wave/PCM for a hahn window
-    return modifiedStream = null;
+    return  null;
     }
-    public static ByteArrayInputStream convertOutToInStream (OutputStream outStream)
-    {
-        
-       //TODO  May not need this function.  Just use ByteArray instead of stream!
-        InputStream poopbutt;
-        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        
-        String testString = "this is a teststring! ";
-        int hashtest = testString.hashCode();
-        System.out.println(hashtest);
-        
-        byte [] poopbyte ;
-        poopbyte = byteOutStream.toByteArray();
-        ByteArrayInputStream byteInStream = new ByteArrayInputStream(poopbyte);
-        //TODO code for buffered transfer of streams.
-        
-        return byteInStream;
-        
-        
-    }
+
     
    public byte[] createSinePCM (short freq, short duration_ms, short ramp_ms, short sampleRate)
    //@TODO all these parameters should be changed to doubles.
    {
-   
        byte [] bytePCMsine = null;
-       
-       
-       
+        //TODO finish createSinePCM
        return bytePCMsine;
    
    }
@@ -187,19 +137,21 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
     /**
      * @param args No command line arguments available in class.
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args) 
+    {
+    // TODO code application logic here
         byte[] pooptest=createSilencePCM(1000, 44100);
         System.out.println(pooptest.length);
-        byte [] otherpoop;
-        
-    otherpoop = createTestPCM(100, 44100, 800);
-    System.out.println("Length of Fake Wave PCM : " +  otherpoop.length);
+        byte [] otherpoop;   
+        otherpoop = createTestPCM(100, 44100, 800);
+        System.out.println("Length of Fake Wave PCM : " +  otherpoop.length);
     //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
-    
     }
     
     }
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//////END OF JAVA CODE!//////////////////////END OF JAVA CODE!//////////////////
 /*WORKING CODE FROM MY VB.NET PROJECT
 Function createWave(ByRef genStream As MemoryStream, ByVal frequency As Double, ByVal msDuration As Integer, _
 Optional ByVal msTrailingSilence As Integer = 0, Optional msRamp As Integer = 4, Optional ByVal volume As UInt16 = 16383) ' 16383
