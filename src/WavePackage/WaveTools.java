@@ -3,17 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wavetools;
+package WavePackage;
 //import java.io.*;
 import java.io.*;
 import javax.sound.sampled.*;
 import java.math.BigDecimal;
+//import WavePackage.*;
+
 /**
  * WaveTools library for working with wave files and to use in MorsePlayer library
  * @author brian_000
  */
 public class WaveTools {
-public double sampleRate = 44100;
+
+   // WavePackage.WaveHeader();
+   // public static WaveHeader CreateHeader;
+    
+    public double sampleRate = 44100;
 public int channels = 1; //currently only supports on channel. Maybe Later 
 public double volume = 27040; // just set a volume for now.
     private static BigDecimal truncateDecimal(double x,int numberofDecimals)
@@ -118,6 +124,9 @@ return null;
    public static byte [] createTestPCM (double duration, double samplerate, double freq)
    {
       //@TODO Implement Volume as percentage! 100% = 32567 and so on....
+       //@TODO implement method of Twiddle Method straight into conversion for 
+        //     improved speed.  Current profile speed is 0.280 to 0.320 milliseconds
+       
        byte [] pcmTEST;
        double arraySize = ((duration/1000)*samplerate);
        short [] pcmShortArray = new short[(int)arraySize];
@@ -130,6 +139,7 @@ return null;
             short slice  =  (short)((24867 * Math.sin(theta * step))); //24867 is volume.  Volume is between 0 and 32???(32000 ish)
             pcmShortArray[step] = slice;
             System.out.println ("STEP : " + step + "  SLICE : " + slice + "//");
+       //TODO add code to twiddle in here for improved speed
         }
        pcmTEST = ShortToByte_Twiddle_Method(pcmShortArray); 
        return pcmTEST;
@@ -145,7 +155,30 @@ return null;
         byte [] otherpoop;   
         otherpoop = createTestPCM(100, 44100, 800);
         System.out.println("Length of Fake Wave PCM : " +  otherpoop.length);
-    //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
+        short length = (short)otherpoop.length;
+            //This line properly intializes the new class! YAY!
+        WaveHeader CreateHeader = new WaveHeader((short)1,(short) 1, 44100, (short)16, (length));
+     OutputStream header;
+     header = new ByteArrayOutputStream(44);
+     //ByteArrayOutputStream header = new ByteArrayOutputStream();
+       // header = new OutputStream(ByteArrayOutputStream(CreateHeader.write(header)));
+        
+     try{
+         int error = CreateHeader.write(header);
+     }
+     catch (IOException e){}
+     
+      //  CreatHeader is null for some reason.?
+        /*    
+        CreateHeader.setBitsPerSample((short)16);
+            CreateHeader.setFormat((short)1);
+            CreateHeader.setNumChannels((short)1);
+            CreateHeader.setSampleRate(44100);
+            CreateHeader.setNumBytes((int)length);
+        */
+        
+        System.out.println(CreateHeader.toString());
+        //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
     
     }
