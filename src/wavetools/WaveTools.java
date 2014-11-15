@@ -114,7 +114,9 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
         
     }
     
-   public byte[] createSinePCM (short freq, short duration_ms, short ramp_ms, short sampleRate){
+   public byte[] createSinePCM (short freq, short duration_ms, short ramp_ms, short sampleRate)
+   //@TODO all these parameters should be changed to doubles.
+   {
    
        byte [] bytePCMsine = null;
        
@@ -123,6 +125,26 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
        return bytePCMsine;
    
    }
+   private static byte [] ShortToByte_Twiddle_Method(short [] input)
+           //http://stackoverflow.com/questions/10804852/how-to-convert-short-array-to-byte-array
+{
+  int short_index, byte_index;
+  int iterations = input.length;
+
+  byte [] buffer = new byte[input.length * 2];
+
+  short_index = byte_index = 0;
+
+  for(/*NOP*/; short_index != iterations; /*NOP*/)
+  {
+    buffer[byte_index]     = (byte) (input[short_index] & 0x00FF); 
+    buffer[byte_index + 1] = (byte) ((input[short_index] & 0xFF00) >> 8);
+
+    ++short_index; byte_index += 2;
+  }
+
+  return buffer;
+}
    /**
     * 
     * @param duration_ms
@@ -131,13 +153,36 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
     */
    public static byte[] createSilencePCM (int duration_ms, int sampleRate)
    {
+       
        byte [] bytePCMsilence = new byte[(duration_ms/1000 * sampleRate)*2];
+       short [] shortPCMsilence = new short[(duration_ms/1000 * sampleRate)];
   
        for (int slice =0; slice < (sampleRate/(duration_ms*0.01)); slice++)
-       {
-       bytePCMsilence [slice] = (short)0 ;
-       }
+        {
+            shortPCMsilence [slice] = (short)0 ;
+        }
+       bytePCMsilence = ShortToByte_Twiddle_Method(shortPCMsilence);
+       
        return bytePCMsilence;
+   }
+   public static byte [] createTestPCM (double duration, double samplerate, double freq)
+   {
+      //@TODO Implement Volume as percentage! 100% = 32567 and so on....
+       byte [] pcmTEST;
+       double arraySize = ((duration/1000)*samplerate);
+       short [] pcmShortArray = new short[(int)arraySize];
+       //short slice;
+       double TAU = Math.PI * 2;
+       double theta = freq * TAU / (samplerate); 
+       
+       for (int step = 0; step < arraySize; step++)
+        {
+            short slice  =  (short)((24867 * Math.sin(theta * step))); //24867 is volume.  Volume is between 0 and 32???(32000 ish)
+            pcmShortArray[step] = slice;
+            System.out.println ("STEP : " + step + "  SLICE : " + slice + "//");
+        }
+       pcmTEST = ShortToByte_Twiddle_Method(pcmShortArray); 
+       return pcmTEST;
    }
     /**
      * @param args No command line arguments available in class.
@@ -146,9 +191,12 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
         // TODO code application logic here
         byte[] pooptest=createSilencePCM(1000, 44100);
         System.out.println(pooptest.length);
+        byte [] otherpoop;
         
-        
-        //createSineWave_PCM(800, 1000, 5);
+    otherpoop = createTestPCM(100, 44100, 800);
+    System.out.println("Length of Fake Wave PCM : " +  otherpoop.length);
+    //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
+    
     }
     
     }
@@ -190,7 +238,7 @@ writer.Write(frameSize) ' AKA 'Block Align' according to https://ccrma.stanford.
 writer.Write(bitsPerSample) ' 8 bit or 16 bit sound sample etc....
 writer.Write(&H61746164) ' = encoding.GetBytes("data")
 writer.Write(dataChunkSize) ' == NumSamples * NumChannels * BitsPerSample/8
-Dim theta As Double = frequency * TAU / CDbl(samplesPerSecond) ' removed -1 from samples per second. CDbl(samplesPerSecond -1)
+' removed -1 from samples per second. CDbl(samplesPerSecond -1)
 ' 'volume' is UInt16 with range 0 thru Uint16.MaxValue ( = 65 535)
 ' we need 'amp' to have the range of 0 thru Int16.MaxValue ( = 32 767)
 Dim amp As Double = volume >> 2 ' so we simply set amp = volume / 2
