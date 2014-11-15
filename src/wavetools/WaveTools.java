@@ -131,11 +131,11 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
     */
    public static byte[] createSilencePCM (int duration_ms, int sampleRate)
    {
-       byte [] bytePCMsilence = new byte[(duration_ms/1000 * sampleRate)];
+       byte [] bytePCMsilence = new byte[(duration_ms/1000 * sampleRate)*2];
   
        for (int slice =0; slice < (sampleRate/(duration_ms*0.01)); slice++)
        {
-       bytePCMsilence [slice] = 0 ;
+       bytePCMsilence [slice] = (short)0 ;
        }
        return bytePCMsilence;
    }
@@ -145,7 +145,8 @@ InputStream is = new ByteArrayInputStream(decodedBytes);
     public static void main(String[] args) {
         // TODO code application logic here
         byte[] pooptest=createSilencePCM(1000, 44100);
-        System.out.print(pooptest[2]);
+        System.out.println(pooptest.length);
+        
         
         //createSineWave_PCM(800, 1000, 5);
     }
