@@ -107,6 +107,42 @@ return null;
     * @param sampleRate
     * @return 
     */
+   public static OutputStream createSilenceWave  (int duration_ms, int sampleRate)
+   {
+       byte[] pcmWave = createSilencePCM(duration_ms, sampleRate);
+       InputStream pcmDataStream = new ByteArrayInputStream(pcmWave);
+       int pcmLength = pcmWave.length;
+       
+       WaveHeader CreateHeader = new WaveHeader ((short)1,(short)1, sampleRate, (short)16, (short)pcmLength);
+       OutputStream header;     //initialize OutputStream
+       header = new ByteArrayOutputStream(44);
+
+       try{
+       int error = CreateHeader.write(header);
+          }
+       catch (IOException e)
+       {
+           //TODO code to catch Exception
+       }
+       
+       //Code to combine both header and PCM data into one
+       ByteArrayOutputStream baosPCMWave = new ByteArrayOutputStream(pcmWave.length);
+       baosPCMWave.write(pcmWave, 0, pcmWave.length);
+       try{
+       header.write(baosPCMWave.toByteArray());
+       }
+       catch (IOException e)
+       {
+           //TODO IOException code
+       }
+       
+       return header;
+       }
+       
+       
+       
+       
+   
    public static byte[] createSilencePCM (int duration_ms, int sampleRate)
    {
        
@@ -176,7 +212,8 @@ return null;
             CreateHeader.setSampleRate(44100);
             CreateHeader.setNumBytes((int)length);
         */
-        
+        OutputStream craptester; 
+        craptester = createSilenceWave(1000, 44100);
         System.out.println(CreateHeader.toString());
         //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
