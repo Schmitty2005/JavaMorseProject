@@ -107,6 +107,40 @@ return null;
     * @param sampleRate
     * @return 
     */
+   public static OutputStream addWaveHeaderToPCM (byte[] pcmStream, int sampleRate)
+   {
+       int totalLength = 44 + (pcmStream.length);
+       byte[] waveSound = new byte[totalLength];
+       
+       WavePackage.WaveHeader NewHeader = new WaveHeader ((short)1,(short) 1,(short) sampleRate, (short)16, (totalLength));
+       
+       OutputStream newWave = new ByteArrayOutputStream();
+       try{
+       NewHeader.write(newWave);
+       newWave.write(pcmStream);
+       }
+       catch (IOException e)
+       {
+       System.out.println(e.getMessage());    //TODO Catch exception!
+       }
+       
+       
+       //now convert outPutStream to byte [] .....or not! lol!
+       //Since it is going to be played, it does not need to !
+       //.....hopefully........lol!
+       
+       return newWave;
+   }
+   
+   
+   
+   /**
+    * Creates a wave format of silence for specified duration and sample rate
+    * @param duration_ms
+    * @param sampleRate
+    * @return An Output Stream is returned
+    */ 
+  
    public static OutputStream createSilenceWave  (int duration_ms, int sampleRate)
    {
        byte[] pcmWave = createSilencePCM(duration_ms, sampleRate);
@@ -180,7 +214,23 @@ return null;
        pcmTEST = ShortToByte_Twiddle_Method(pcmShortArray); 
        return pcmTEST;
    }
-    /**
+public static int testfile (OutputStream waveStream)
+{
+    int err = 0;
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    bos.write(0);
+    bos.close();
+    byte[] arr = bos.toByteArray();
+    // what do you want to do?
+    os.write(arr); // or: bos.writeTo(os);
+    //file testFile = "test.wav";
+    
+    
+    return err;
+}
+   
+   
+   /**
      * @param args No command line arguments available in class.
      */
     public static void main(String[] args) 
@@ -215,6 +265,14 @@ return null;
         OutputStream craptester; 
         craptester = createSilenceWave(1000, 44100);
         System.out.println(CreateHeader.toString());
+        
+        byte [] testWave;
+        OutputStream fullWave; 
+        
+        testWave = createSilencePCM(1000, 44100); // create one second of PCM silence....
+        fullWave = createSilenceWave(1000, 44100);
+        
+        system.out.println(fullWave);
         //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
     
