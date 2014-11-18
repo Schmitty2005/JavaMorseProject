@@ -8,6 +8,8 @@ package WavePackage;
 import java.io.*;
 import javax.sound.sampled.*;
 import java.math.BigDecimal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 //import WavePackage.*;
 
 /**
@@ -144,7 +146,7 @@ return null;
    public static OutputStream createSilenceWave  (int duration_ms, int sampleRate)
    {
        byte[] pcmWave = createSilencePCM(duration_ms, sampleRate);
-       InputStream pcmDataStream = new ByteArrayInputStream(pcmWave);
+       //InputStream pcmDataStream = new ByteArrayInputStream(pcmWave);
        int pcmLength = pcmWave.length;
        
        WaveHeader CreateHeader = new WaveHeader ((short)1,(short)1, sampleRate, (short)16, (short)pcmLength);
@@ -153,6 +155,7 @@ return null;
 
        try{
        int error = CreateHeader.write(header);
+  
           }
        catch (IOException e)
        {
@@ -218,11 +221,11 @@ public static int testfile (OutputStream waveStream)
 {
     int err = 0;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    bos.write(0);
-    bos.close();
-    byte[] arr = bos.toByteArray();
+    //bos.write(waveStream);
+    //bos.close();
+    //byte[] arr = bos.toByteArray();
     // what do you want to do?
-    os.write(arr); // or: bos.writeTo(os);
+    //bos.write(arr); // or: bos.writeTo(os);
     //file testFile = "test.wav";
     
     
@@ -235,7 +238,39 @@ public static int testfile (OutputStream waveStream)
      */
     public static void main(String[] args) 
     {
-    // TODO code application logic here
+        //
+        //   header stream MUST be declared as ByteArrayStream!  Then it can be converted!
+        //
+        // Any OutputStream can accept a ByteArrayStream as it is an OutputStream!
+        //      
+        //              PROBLEM SOLVED ! YAY!
+        //
+        
+        ///NOPE!  Check WaveHeader params when I have time...... :(
+        WaveHeader newHeader = new WaveHeader ((short)1,(short)1,(short)16,(short)44100,(short)1000);
+        ByteArrayOutputStream newestHeader = new ByteArrayOutputStream(44);
+        
+        try {
+            newestHeader = new ByteArrayOutputStream(newHeader.write(newestHeader));
+        } catch (IOException ex) {
+            Logger.getLogger(WaveTools.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        byte pooptest[] = newestHeader.toByteArray();
+        int lengthofpoop = pooptest.length;
+        System.out.println(lengthofpoop);
+        //
+        //  HOPEFULLY WORKING CODE! YAY!
+        //
+        try{
+            newHeader.write(newestHeader);
+        }
+        catch (IOException e)
+        {
+        
+        }
+        //newestHeader.<no method>  WTF? can't convert to BYte Array Stream? Declared as ByteArrayOutputStream!
+        ne
+// TODO code application logic here
         byte[] pooptest=createSilencePCM(1000, 44100);
         System.out.println(pooptest.length);
         byte [] otherpoop;   
@@ -272,7 +307,7 @@ public static int testfile (OutputStream waveStream)
         testWave = createSilencePCM(1000, 44100); // create one second of PCM silence....
         fullWave = createSilenceWave(1000, 44100);
         
-        system.out.println(fullWave);
+        System.out.println(fullWave);
         //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
     
