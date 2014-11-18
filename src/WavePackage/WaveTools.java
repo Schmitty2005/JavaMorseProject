@@ -231,8 +231,84 @@ public static int testfile (OutputStream waveStream)
     
     return err;
 }
-   
-   
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Start of CODE From Stack Exchange 
+//      http://stackoverflow.com/questions/9179536/writing-pcm-recorded-data-into-a-wav-file-java-android
+////////////////////////////////////////////////////////////////////////////////
+private void properWAV(File fileToConvert, float newRecordingID){
+    try {
+        long mySubChunk1Size = 16;
+        int myBitsPerSample= 16;
+        int myFormat = 1;
+        long myChannels = 1;
+        long mySampleRate = 22100;
+        long myByteRate = mySampleRate * myChannels * myBitsPerSample/8;
+        int myBlockAlign = (int) (myChannels * myBitsPerSample/8);
+// Change this to pcmWave.length()
+        byte[] clipData = getBytesFromFile(fileToConvert);
+
+        long myDataSize = clipData.length;
+        long myChunk2Size =  myDataSize * myChannels * myBitsPerSample/8;
+        long myChunkSize = 36 + myChunk2Size;
+
+        //Convert  Method to store data to byte array instead of outputStream!
+        
+        OutputStream os;        
+        os = new FileOutputStream(new File("/sdcard/onefile/assessor/OneFile_Audio_"+ newRecordingID+".wav"));
+        BufferedOutputStream bos = new BufferedOutputStream(os);
+        DataOutputStream outFile = new DataOutputStream(bos);
+
+        outFile.writeBytes("RIFF");                                 // 00 - RIFF
+        outFile.write(intToByteArray((int)myChunkSize), 0, 4);      // 04 - how big is the rest of this file?
+        outFile.writeBytes("WAVE");                                 // 08 - WAVE
+        outFile.writeBytes("fmt ");                                 // 12 - fmt 
+        outFile.write(intToByteArray((int)mySubChunk1Size), 0, 4);  // 16 - size of this chunk
+        outFile.write(shortToByteArray((short)myFormat), 0, 2);     // 20 - what is the audio format? 1 for PCM = Pulse Code Modulation
+        outFile.write(shortToByteArray((short)myChannels), 0, 2);   // 22 - mono or stereo? 1 or 2?  (or 5 or ???)
+        outFile.write(intToByteArray((int)mySampleRate), 0, 4);     // 24 - samples per second (numbers per second)
+        outFile.write(intToByteArray((int)myByteRate), 0, 4);       // 28 - bytes per second
+        outFile.write(shortToByteArray((short)myBlockAlign), 0, 2); // 32 - # of bytes in one sample, for all channels
+        outFile.write(shortToByteArray((short)myBitsPerSample), 0, 2);  // 34 - how many bits in a sample(number)?  usually 16 or 24
+        outFile.writeBytes("data");                                 // 36 - data
+        outFile.write(intToByteArray((int)myDataSize), 0, 4);       // 40 - how big is this data chunk
+        outFile.write(clipData);                                    // 44 - the actual data itself - just a long string of numbers
+
+        outFile.flush();
+        outFile.close();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+}
+
+
+private static byte[] intToByteArray(int i)
+    {
+        byte[] b = new byte[4];
+        b[0] = (byte) (i & 0x00FF);
+        b[1] = (byte) ((i >> 8) & 0x000000FF);
+        b[2] = (byte) ((i >> 16) & 0x000000FF);
+        b[3] = (byte) ((i >> 24) & 0x000000FF);
+        return b;
+    }
+
+    // convert a short to a byte array
+    public static byte[] shortToByteArray(short data)
+    {
+        /*
+         * NB have also tried:
+         * return new byte[]{(byte)(data & 0xff),(byte)((data >> 8) & 0xff)};
+         * 
+         */
+
+        return new byte[]{(byte)(data & 0xff),(byte)((data >>> 8) & 0xff)};
+    }
+////////////////////////////////////////////////////////////////////////////////
+// End of CODE From Stack Exchange                                            //
+////////////////////////////////////////////////////////////////////////////////
    /**
      * @param args No command line arguments available in class.
      */
@@ -269,9 +345,10 @@ public static int testfile (OutputStream waveStream)
         
         }
         //newestHeader.<no method>  WTF? can't convert to BYte Array Stream? Declared as ByteArrayOutputStream!
-        ne
+        //ne
 // TODO code application logic here
-        byte[] pooptest=createSilencePCM(1000, 44100);
+        byte[] pooptest2=createSilencePCM(1000, 44100);
+        short testbyte = pooptest2[1];
         System.out.println(pooptest.length);
         byte [] otherpoop;   
         otherpoop = createTestPCM(100, 44100, 800);
