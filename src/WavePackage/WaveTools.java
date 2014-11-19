@@ -78,7 +78,10 @@ public class WaveTools {
         //switch back to little Endian
         waveBuffer.order(ByteOrder.LITTLE_ENDIAN);
         waveBuffer.putInt(88200); //just for testing!  //4   Subchunk2Size    == NumSamples * NumChannels * BitsPerSample/8
-
+        //TODO waveBuffer still needs PCM data added!
+        waveBuffer.put(pcmData);
+        //convert waveBuffer to byte[]
+        completeWave = waveBuffer.array();
         return completeWave;
     }
 
@@ -402,12 +405,16 @@ public class WaveTools {
         System.out.println(CreateHeader.toString());
 
         byte[] testWave;
+        byte [] pcmWave;
+        byte [] waveWithHeader;
         OutputStream fullWave;
 
         testWave = createSilencePCM(1000, 44100); // create one second of PCM silence....
         fullWave = createSilenceWave(1000, 44100);
-
-        System.out.println(fullWave);
+pcmWave = createSilencePCM(1000, 44100);
+waveWithHeader = createWaveHeaderForPcm(pcmWave, (short)1, 44100, (short)16);
+        
+        System.out.println(waveWithHeader.length);
         //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
