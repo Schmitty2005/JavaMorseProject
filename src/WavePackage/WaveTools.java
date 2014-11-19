@@ -31,16 +31,34 @@ public class WaveTools {
             return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_CEILING);
         }
     }
+class PcmHeader 
+{
+    int mSampleRate = 44100;
+    short mChannels = 1;
+    short mBitsPerSample = 16;
+    String mWaveName;
+    String mFileName = mWaveName+".wav";
+    //TODO this is for input into the createWaveHeaderForPcm sub!
+    //TODO find out how to add a byte array to this !
+}
 
-    public static byte[] createWaveHeaderForPcm(byte[] pcmData, short dataType, int sampleRate, short bitsPerSample) {
+    public static byte[] createWaveHeaderForPcm(byte[] pcmData,  int sampleRate, short bitsPerSample) {
+        //Initialize variables for wave header
+        short numberChannels = 1;  // number of channels
+        int byteRate = sampleRate * numberChannels * bitsPerSample / 8 ; // @TODO calculate this one == SampleRate * NumChannels * BitsPerSample/8
+        short blockAlign = (short)(numberChannels * bitsPerSample / 8) ; //@TODO calculate this one == NumChannels * BitsPerSample/8
+        int subChunk2Size = pcmData.length;
+        //
         int pcmLength = pcmData.length;
         int waveLength = pcmData.length + 44;
+        waveLength ++;
         if (waveLength % 2 != 0) {
-            waveLength++;
+            waveLength++; pcmLength++; pcmLength++;
         }  //wave files must have an even number of bytes!
         System.out.println("waveLength Value : " + waveLength);
         ByteBuffer waveBuffer = ByteBuffer.allocate(pcmLength + 44);
         byte[] completeWave = new byte[pcmLength + 44];
+        waveBuffer.position(0);
         //Set to Big Endian for RIFF
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
         //write ASCII 'RIFF' to Byte Buffer
@@ -51,7 +69,7 @@ public class WaveTools {
         //Set to Little Endian for ChunkSize
         waveBuffer.order(ByteOrder.LITTLE_ENDIAN);
         //write Int Subchunk size
-        waveBuffer.putInt(36 + 44100); //Should be calculated properly...This is jjust for testing
+        waveBuffer.putInt(36 + subChunk2Size); //Should be calculated properly...This is jjust for testing
         //Set to Big Endian for WAVE
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
         //write ASCII 'WAVE' to Byte Buffer
@@ -62,13 +80,13 @@ public class WaveTools {
         waveBuffer.put(asciifmt);
         //sub chunk size also bitrate = 16
         waveBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        waveBuffer.putInt(16);  //This is 16 for the bit-rate
+        waveBuffer.putInt(bitsPerSample);  //This is 16 for the bit-rate  ***WATCH FOR ERRORS HERE
         waveBuffer.putShort((short) 1);  //1 is for PCM 2   AudioFormat      PCM = 1 (i.e. Linear quantization)
-        waveBuffer.putShort((short) 1); //2   NumChannels      Mono = 1, Stereo = 2, etc.
+        waveBuffer.putShort(numberChannels); //2   NumChannels      Mono = 1, Stereo = 2, etc.
         waveBuffer.putInt(sampleRate);  //sample rate
-        waveBuffer.putInt(44100 * 2);//28        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
-        waveBuffer.putShort((short) 2);//2   BlockAlign       == NumChannels * BitsPerSample/8
-        waveBuffer.putShort((short) 16);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
+        waveBuffer.putInt(byteRate);//28        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
+        waveBuffer.putShort(blockAlign);//2   BlockAlign       == NumChannels * BitsPerSample/8
+        waveBuffer.putShort(bitsPerSample);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
         waveBuffer.putShort((short) 0);  //extra parameter....not needed if PCM!
         //switch to big endian again
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
@@ -77,8 +95,8 @@ public class WaveTools {
         waveBuffer.put(asciidata);
         //switch back to little Endian
         waveBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        waveBuffer.putInt(88200); //just for testing!  //4   Subchunk2Size    == NumSamples * NumChannels * BitsPerSample/8
-        //TODO waveBuffer still needs PCM data added!
+        waveBuffer.putInt(subChunk2Size); 
+        // ADD PCM DATA TO HEADER
         waveBuffer.put(pcmData);
         //convert waveBuffer to byte[]
         completeWave = waveBuffer.array();
@@ -412,9 +430,14 @@ public class WaveTools {
         testWave = createSilencePCM(1000, 44100); // create one second of PCM silence....
         fullWave = createSilenceWave(1000, 44100);
 pcmWave = createSilencePCM(1000, 44100);
-waveWithHeader = createWaveHeaderForPcm(pcmWave, (short)1, 44100, (short)16);
+waveWithHeader = createWaveHeaderForPcm(pcmWave, 44100, (short)16);
         
         System.out.println(waveWithHeader.length);
+        InputStream inputWave = new ByteArrayInputStream(waveWithHeader);
+        boolean support = inputWave.markSupported();
+        System.out.println(support);
+        System.out.println(inputWave.getClass());
+        System.out.println(inputWave.toString());
         //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
