@@ -243,6 +243,9 @@ class PcmHeader
         for (int slice = 0; slice < (sampleRate / (duration_ms * 0.01)); slice++) {
             shortPCMsilence[slice] = (short) 0;
         }
+        //TODO rewrite this procedure to use ByteArrayBuffer.putShort (slice) instead of Twiddle.
+        // Current method is profiled at 11.6milliseconds using twiddle bits! (slow!)
+        
         bytePCMsilence = ShortToByte_Twiddle_Method(shortPCMsilence);
 
         return bytePCMsilence;
