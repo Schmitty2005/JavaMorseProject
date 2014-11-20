@@ -148,12 +148,15 @@ class PcmHeader
     public byte[] createSinePCM(short freq, short duration_ms, short ramp_ms, short sampleRate) //@TODO all these parameters should be changed to doubles.
     {
         byte[] bytePCMsine = null;
+        ByteBuffer bb = ByteBuffer.allocate(88200+2); //88200 is for testing purposes
         //TODO finish createSinePCM
         return bytePCMsine;
 
     }
 
     private static byte[] ShortToByte_Twiddle_Method(short[] input) //http://stackoverflow.com/questions/10804852/how-to-convert-short-array-to-byte-array
+    //this can be deleted! YAY!  Slow method!  Switched to using ByteBuffers instead of this!
+    
     {
         int short_index, byte_index;
         int iterations = input.length;
@@ -181,6 +184,8 @@ class PcmHeader
      */
     
     public static OutputStream addWaveHeaderToPCM(byte[] pcmStream, int sampleRate) {
+        
+        //TODO this is deprecated method.  Use new method!
         int totalLength = 44 + (pcmStream.length);
         byte[] waveSound = new byte[totalLength];
 
@@ -237,8 +242,20 @@ class PcmHeader
 
     public static byte[] createSilencePCM(int duration_ms, int sampleRate) {
 
+        
+        //TODO Measure the time in profile of this method vs twiddle!
+        //SUCCESS!  This method is only 0.23 milliseconds compared to 11.6mSeconds! YAY!
         byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
-        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
+        ByteBuffer bb = ByteBuffer.allocate((duration_ms/1000*sampleRate)+4); 
+        bb.asShortBuffer();
+        bb.position(0);
+        for (int slice =0; slice < (sampleRate / (duration_ms * 0.01)); slice++){
+            bb.putShort((short)0);
+        
+        }
+        bytePCMsilence = bb.array();
+        
+        /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
 
         for (int slice = 0; slice < (sampleRate / (duration_ms * 0.01)); slice++) {
             shortPCMsilence[slice] = (short) 0;
@@ -247,7 +264,7 @@ class PcmHeader
         // Current method is profiled at 11.6milliseconds using twiddle bits! (slow!)
         
         bytePCMsilence = ShortToByte_Twiddle_Method(shortPCMsilence);
-
+*/
         return bytePCMsilence;
     }
 
