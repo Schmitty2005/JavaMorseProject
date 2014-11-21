@@ -145,11 +145,26 @@ class PcmHeader
         return null;
     }
 
-    public byte[] createSinePCM(short freq, short duration_ms, short ramp_ms, short sampleRate) //@TODO all these parameters should be changed to doubles.
+    public static byte[] createSinePCM(short freq, short duration_ms, short ramp_ms, int sampleRate) //@TODO all these parameters should be changed to doubles.
     {
-        byte[] bytePCMsine = null;
-        ByteBuffer bb = ByteBuffer.allocate(88200+2); //88200 is for testing purposes
-        //TODO finish createSinePCM
+//@TODO add parameter for volume into function!
+        
+        short tempvolume = 28800; // test value of volume!
+        // This may not work......just an initial test run
+        double calculate;
+        int numberSlices = duration_ms/1000 * sampleRate;    //this may be wrong....just testing
+        //set up ByteBuffer
+        ByteBuffer bb = ByteBuffer.allocate((numberSlices*2)); //88200 is for testing purposes
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.asShortBuffer();
+        bb.position(0);
+        //Loop for sine wave
+        for (int step = 0; step < numberSlices; step ++){
+            calculate = (Math.sin(freq*Math.PI*2*step/sampleRate)*tempvolume);
+            bb.putShort((short)(calculate));
+        }
+        byte [] bytePCMsine = bb.array();
+
         return bytePCMsine;
 
     }
@@ -283,7 +298,7 @@ class PcmHeader
         for (int step = 0; step < arraySize; step++) {
             short slice = (short) ((24867 * Math.sin(theta * step))); //24867 is volume.  Volume is between 0 and 32???(32000 ish)
             pcmShortArray[step] = slice;
-            System.out.println("STEP : " + step + "  SLICE : " + slice + "//");
+//            System.out.println("STEP : " + step + "  SLICE : " + slice + "//");
             //TODO add code to twiddle in here for improved speed
         }
         pcmTEST = ShortToByte_Twiddle_Method(pcmShortArray);
@@ -458,7 +473,17 @@ waveWithHeader = createWaveHeaderForPcm(pcmWave, 44100, (short)16);
         System.out.println(support);
         System.out.println(inputWave.getClass());
         System.out.println(inputWave.toString());
-        //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
+
+        
+//create PCM
+byte [] testPCMsine ;
+testPCMsine = createSinePCM((short)10000, (short)1000, (short)1000, 44100);
+
+//Add wave Header to PCM
+byte [] testWaveWithHeader;
+testWaveWithHeader = createWaveHeaderForPcm(testPCMsine, (short)44100,(short) 16);
+System.out.println(testWaveWithHeader.length);
+//TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
 }
