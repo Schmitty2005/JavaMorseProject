@@ -12,6 +12,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+//these imports are for file saving
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 /**
  * WaveTools library for working with wave files and to use in MorsePlayer
  * library
@@ -24,13 +29,39 @@ public class WaveTools {
     public int channels = 1; //currently only supports on channel. Maybe Later 
     public double volume = 27040; // just set a volume for now.
 
-    private static BigDecimal truncateDecimal(double x, int numberofDecimals) {
-        if (x > 0) {
-            return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_FLOOR);
-        } else {
-            return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_CEILING);
-        }
-    }
+    public static void saveToWaveFile (byte [] waveByteArray, String filename)
+    {
+    FileOutputStream fop = null;
+		File file;
+		
+		try {
+ 
+			file = new File(filename);
+			fop = new FileOutputStream(file);
+ 
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			fop.write(waveByteArray);
+			fop.flush();
+			fop.close();
+ 
+			System.out.println("Done");
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fop != null) {
+					fop.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	
+    }    
 class PcmHeader 
 {
     int mSampleRate = 44100;
@@ -41,17 +72,24 @@ class PcmHeader
     //TODO this is for input into the createWaveHeaderForPcm sub!
     //TODO find out how to add a byte array to this !
 }
-
+/**
+ * This method accepts a byte array and creates and attaches a wave header to the data.
+ * @param pcmData Pure PCM data as a byte []
+ * @param sampleRate Sample rate of PCM data.  Usually 44100
+ * @param bitsPerSample Bit rate of PCM data.  Usually 16
+ * @return Returns Byte Array with newly created wave header and PCM wave data attached.
+ */
     public static byte[] createWaveHeaderForPcm(byte[] pcmData,  int sampleRate, short bitsPerSample) {
         //Initialize variables for wave header
         short numberChannels = 1;  // number of channels
-        int byteRate = sampleRate * numberChannels * bitsPerSample / 8 ; // @TODO calculate this one == SampleRate * NumChannels * BitsPerSample/8
-        short blockAlign = (short)(numberChannels * bitsPerSample / 8) ; //@TODO calculate this one == NumChannels * BitsPerSample/8
+        int byteRate = sampleRate * numberChannels * bitsPerSample / 8 ; 
+        short blockAlign = (short)(numberChannels * bitsPerSample / 8) ; 
         int subChunk2Size = pcmData.length;
         //
         int pcmLength = pcmData.length;
         int waveLength = pcmData.length + 44;
         waveLength ++;
+        //conduct check of wave file length
         if (waveLength % 2 != 0) {
             waveLength++; pcmLength++; pcmLength++;
         }  //wave files must have an even number of bytes!
@@ -102,46 +140,34 @@ class PcmHeader
         completeWave = waveBuffer.array();
         return completeWave;
     }
-
-    // remove static keyword after testing!
-
-    /**
-     * Generates a sine wave based on 3 simple parameters.
-     *
-     * @param freq The desired frequency of the tone
-     * @param msDuration The total duration of the tone in milli seconds.
-     * @param msRamp The time in milliseconds of the desired volume ramp.
-     * @return AudioInputStream
-     */
-    public static AudioInputStream createSineWave_PCM(int freq, int msDuration, int msRamp) {
-//TODO check to make sure variables are now correct
-        final double TAU = 2 * Math.PI;
-        int msTrailingSilence = 0;
-        int formatChunkSize = 16;
-        int headerSize = 8;
-        short formatType = 1;
-        short tracks = 1; //MONO Only for now!
-        int samplesPerSecond = 44100;
-        short bitsPerSample = 16;
-        short frameSize = 2;  //' manual input of 2 because it should be right! CShort(tracks * ((bitsPerSample + 7) \ 8))
-        int bytesPerSecond = samplesPerSecond * frameSize;
-        int waveSize = 2; // change from 4 to 2
-        int total_samples = (msDuration) * (samplesPerSecond / 1000);// 'removed /1000 from both
-        double rampSamples = samplesPerSecond * msRamp * 0.001; //'number of samples for ramp
-        double full_amplitude_samples = total_samples - (rampSamples * 2);// 'number of samples at full amplitude
-        double silenceSamples = samplesPerSecond * msTrailingSilence * 0.001;
-        int dataChunkSize = (int) (total_samples * 2) + (int) (silenceSamples * 2);//'frameSize --- changed 1 to 2 5/28/14
-        int fileSize = 36 + dataChunkSize;//'waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize
-//this is a test to write to the stream!
-
-//TODO code for creating a sine wave and storing in a stream
-//TODO  This code below converts a byte array to an input Stream.  SIMPLE!
-        return null;
-    }
-
-    public AudioInputStream createHahnWindow(int durationMilliSecs, boolean atBegining, boolean atEnding) {
-        //TODO code will be changed to byte[] instead of AudioInputStream!
+    
+    public static byte [] createHannWindow(int durationMilliSecs, boolean atBegining, boolean atEnding) {
+        
         //TODO code for modifiying existing values in a wave/PCM for a hahn window
+        
+        //This code is in C for a hann window
+        //http://www.labbookpages.co.uk/audio/wavGenFunc.html#tone
+        /*
+        void fadeInOut(float *buffer, long numSamples, int sampleRate, float fadeTime)
+{
+   // Calculate duration, in samples, of fade time
+   long numFadeSamples = fadeTime * sampleRate;
+
+   // Make sure the fade time is not longer than the number of avialable samples
+   if (numFadeSamples > numSamples) numFadeSamples = numSamples;
+
+   long s;
+   for (s=0 ; s<numFadeSamples ; s++)
+   {
+      // Calculate weight based on Hann 'raised cosine' window
+      float weight = 0.5 * (1 - cos(M_PI * s / (numFadeSamples - 1)));
+
+      // Apply weighting
+      buffer[s] *= weight;                      // Fade In
+      buffer[numSamples-(s+1)] *= weight;       // Fade Out
+   }
+}
+        */
         return null;
     }
 
@@ -164,7 +190,14 @@ class PcmHeader
             bb.putShort((short)(calculate));
         }
         byte [] bytePCMsine = bb.array();
-
+        /*
+        //this is for testing only....FOR statment and brackets can b 
+        // be deleted after testing shows it works.
+        for (int slot = 0; slot <150; slot++)
+        {short testout = bb.getShort(slot);
+        System.out.println("Slot: " + slot + " Value : "+ testout);
+        }
+        */
         return bytePCMsine;
 
     }
@@ -191,13 +224,12 @@ class PcmHeader
         return buffer;
     }
 
-    /**
-     *
-     * @param duration_ms
-     * @param sampleRate
-     * @return
-     */
-    
+ /**
+  * 
+  * @param pcmStream
+  * @param sampleRate
+  * @return 
+  */
     public static OutputStream addWaveHeaderToPCM(byte[] pcmStream, int sampleRate) {
         
         //TODO this is deprecated method.  Use new method!
@@ -268,6 +300,7 @@ class PcmHeader
             bb.putShort((short)0);
         
         }
+        
         bytePCMsilence = bb.array();
         
         /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
@@ -395,68 +428,8 @@ class PcmHeader
      * @param args No command line arguments available in class.
      */
     public static void main(String[] args) {
-        //
-        //   header stream MUST be declared as ByteArrayStream!  Then it can be converted!
-        //
-        // Any OutputStream can accept a ByteArrayStream as it is an OutputStream!
-        //      
-        //              PROBLEM SOLVED ! YAY!
-        //
-
-        ///NOPE!  Check WaveHeader params when I have time...... :(
-        WaveHeader newHeader = new WaveHeader((short) 1, (short) 1, (short) 16, (short) 44100, (short) 1000);
-        ByteArrayOutputStream newestHeader = new ByteArrayOutputStream(44);
-
-        try {
-            newestHeader = new ByteArrayOutputStream(newHeader.write(newestHeader));
-        } catch (IOException ex) {
-            Logger.getLogger(WaveTools.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        byte pooptest[] = newestHeader.toByteArray();
-        int lengthofpoop = pooptest.length;
-        System.out.println(lengthofpoop);
-        //
-        //  HOPEFULLY WORKING CODE! YAY!
-        //
-        try {
-            newHeader.write(newestHeader);
-        } catch (IOException e) {
-
-        }
-        //newestHeader.<no method>  WTF? can't convert to BYte Array Stream? Declared as ByteArrayOutputStream!
-        //ne
+  
 // TODO code application logic here
-        byte[] pooptest2 = createSilencePCM(1000, 44100);
-        short testbyte = pooptest2[1];
-        System.out.println(pooptest.length);
-        byte[] otherpoop;
-        otherpoop = createTestPCM(100, 44100, 800);
-        System.out.println("Length of Fake Wave PCM : " + otherpoop.length);
-        short length = (short) otherpoop.length;
-        //This line properly intializes the new class! YAY!
-        WaveHeader CreateHeader = new WaveHeader((short) 1, (short) 1, 44100, (short) 16, (length));
-        OutputStream header;
-        header = new ByteArrayOutputStream(44);
-     //ByteArrayOutputStream header = new ByteArrayOutputStream();
-        // header = new OutputStream(ByteArrayOutputStream(CreateHeader.write(header)));
-
-        try {
-            int error = CreateHeader.write(header);
-        } catch (IOException e) {
-        }
-
-      //  CreatHeader is null for some reason.?
-        /*    
-         CreateHeader.setBitsPerSample((short)16);
-         CreateHeader.setFormat((short)1);
-         CreateHeader.setNumChannels((short)1);
-         CreateHeader.setSampleRate(44100);
-         CreateHeader.setNumBytes((int)length);
-         */
-        OutputStream craptester;
-        craptester = createSilenceWave(1000, 44100);
-        System.out.println(CreateHeader.toString());
-
         byte[] testWave;
         byte [] pcmWave;
         byte [] waveWithHeader;
@@ -477,12 +450,14 @@ waveWithHeader = createWaveHeaderForPcm(pcmWave, 44100, (short)16);
         
 //create PCM
 byte [] testPCMsine ;
-testPCMsine = createSinePCM((short)10000, (short)1000, (short)1000, 44100);
+testPCMsine = createSinePCM((short)1000, (short)1000, (short)1000, 44100);
 
 //Add wave Header to PCM
 byte [] testWaveWithHeader;
 testWaveWithHeader = createWaveHeaderForPcm(testPCMsine, (short)44100,(short) 16);
 System.out.println(testWaveWithHeader.length);
+        saveToWaveFile(testPCMsine, "testpcm.pcm");  // pcm data looks beautiful in audacity!
+        saveToWaveFile(testWaveWithHeader, "testwave.wav"); // wave wont load :( in Audacity
 //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
