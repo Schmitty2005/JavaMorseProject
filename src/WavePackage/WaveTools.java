@@ -7,9 +7,6 @@ package WavePackage;
 
 import java.io.*;
 import javax.sound.sampled.*;
-import java.math.BigDecimal;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 //these imports are for file saving
@@ -50,14 +47,12 @@ public class WaveTools {
 			System.out.println("Done");
  
 		} catch (IOException e) {
-			e.printStackTrace();
 		} finally {
 			try {
 				if (fop != null) {
 					fop.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	
@@ -95,7 +90,7 @@ class PcmHeader
         }  //wave files must have an even number of bytes!
         System.out.println("waveLength Value : " + waveLength);
         ByteBuffer waveBuffer = ByteBuffer.allocate(pcmLength + 44);
-        byte[] completeWave = new byte[pcmLength + 44];
+        //byte[] completeWave = new byte[pcmLength + 44];
         waveBuffer.position(0);
         //Set to Big Endian for RIFF
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
@@ -137,7 +132,7 @@ class PcmHeader
         // ADD PCM DATA TO HEADER
         waveBuffer.put(pcmData);
         //convert waveBuffer to byte[]
-        completeWave = waveBuffer.array();
+        byte[] completeWave = waveBuffer.array();
         return completeWave;
     }
     
@@ -202,56 +197,6 @@ class PcmHeader
 
     }
 
-    private static byte[] ShortToByte_Twiddle_Method(short[] input) //http://stackoverflow.com/questions/10804852/how-to-convert-short-array-to-byte-array
-    //this can be deleted! YAY!  Slow method!  Switched to using ByteBuffers instead of this!
-    
-    {
-        int short_index, byte_index;
-        int iterations = input.length;
-
-        byte[] buffer = new byte[input.length * 2];
-
-        short_index = byte_index = 0;
-
-        for (/*NOP*/; short_index != iterations; /*NOP*/) {
-            buffer[byte_index] = (byte) (input[short_index] & 0x00FF);
-            buffer[byte_index + 1] = (byte) ((input[short_index] & 0xFF00) >> 8);
-
-            ++short_index;
-            byte_index += 2;
-        }
-
-        return buffer;
-    }
-
- /**
-  * 
-  * @param pcmStream
-  * @param sampleRate
-  * @return 
-  */
-    public static OutputStream addWaveHeaderToPCM(byte[] pcmStream, int sampleRate) {
-        
-        //TODO this is deprecated method.  Use new method!
-        int totalLength = 44 + (pcmStream.length);
-        byte[] waveSound = new byte[totalLength];
-
-        WavePackage.WaveHeader NewHeader = new WaveHeader((short) 1, (short) 1, (short) sampleRate, (short) 16, (totalLength));
-
-        OutputStream newWave = new ByteArrayOutputStream();
-        try {
-            NewHeader.write(newWave);
-            newWave.write(pcmStream);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());    //TODO Catch exception!
-        }
-
-       //now convert outPutStream to byte [] .....or not! lol!
-        //Since it is going to be played, it does not need to !
-        //.....hopefully........lol!
-        return newWave;
-    }
-
     /**
      * Creates a wave format of silence for specified duration and sample rate
      *
@@ -259,40 +204,12 @@ class PcmHeader
      * @param sampleRate
      * @return An Output Stream is returned
      */
-    public static OutputStream createSilenceWave(int duration_ms, int sampleRate) {
-        byte[] pcmWave = createSilencePCM(duration_ms, sampleRate);
-        //InputStream pcmDataStream = new ByteArrayInputStream(pcmWave);
-        int pcmLength = pcmWave.length;
-
-        WaveHeader CreateHeader = new WaveHeader((short) 1, (short) 1, sampleRate, (short) 16, (short) pcmLength);
-        OutputStream header;     //initialize OutputStream
-        header = new ByteArrayOutputStream(44);
-
-        try {
-            int error = CreateHeader.write(header);
-
-        } catch (IOException e) {
-            //TODO code to catch Exception
-        }
-
-        //Code to combine both header and PCM data into one
-        ByteArrayOutputStream baosPCMWave = new ByteArrayOutputStream(pcmWave.length);
-        baosPCMWave.write(pcmWave, 0, pcmWave.length);
-        try {
-            header.write(baosPCMWave.toByteArray());
-        } catch (IOException e) {
-            //TODO IOException code
-        }
-
-        return header;
-    }
-
     public static byte[] createSilencePCM(int duration_ms, int sampleRate) {
 
         
         //TODO Measure the time in profile of this method vs twiddle!
         //SUCCESS!  This method is only 0.23 milliseconds compared to 11.6mSeconds! YAY!
-        byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
+       // byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
         ByteBuffer bb = ByteBuffer.allocate((duration_ms/1000*sampleRate)+4); 
         bb.asShortBuffer();
         bb.position(0);
@@ -300,7 +217,7 @@ class PcmHeader
             bb.putShort((short)0);
         
         }
-        
+        byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
         bytePCMsilence = bb.array();
         
         /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
@@ -316,110 +233,13 @@ class PcmHeader
         return bytePCMsilence;
     }
 
-    public static byte[] createTestPCM(double duration, double samplerate, double freq) {
-      //@TODO Implement Volume as percentage! 100% = 32567 and so on....
-        //@TODO implement method of Twiddle Method straight into conversion for 
-        //     improved speed.  Current profile speed is 0.280 to 0.320 milliseconds
-
-        byte[] pcmTEST;
-        double arraySize = ((duration / 1000) * samplerate);
-        short[] pcmShortArray = new short[(int) arraySize];
-        //short slice;
-        double TAU = Math.PI * 2;
-        double theta = freq * TAU / (samplerate);
-
-        for (int step = 0; step < arraySize; step++) {
-            short slice = (short) ((24867 * Math.sin(theta * step))); //24867 is volume.  Volume is between 0 and 32???(32000 ish)
-            pcmShortArray[step] = slice;
-//            System.out.println("STEP : " + step + "  SLICE : " + slice + "//");
-            //TODO add code to twiddle in here for improved speed
-        }
-        pcmTEST = ShortToByte_Twiddle_Method(pcmShortArray);
-        return pcmTEST;
-    }
-
-    public static int testfile(OutputStream waveStream) {
-        int err = 0;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    //bos.write(waveStream);
-        //bos.close();
-        //byte[] arr = bos.toByteArray();
-        // what do you want to do?
-        //bos.write(arr); // or: bos.writeTo(os);
-        //file testFile = "test.wav";
-
-        return err;
-    }
-
 ////////////////////////////////////////////////////////////////////////////////
 // Start of CODE From Stack Exchange 
 //      http://stackoverflow.com/questions/9179536/writing-pcm-recorded-data-into-a-wav-file-java-android
 ////////////////////////////////////////////////////////////////////////////////
-    private void properWAV(File fileToConvert, float newRecordingID) {
-        try {
-            long mySubChunk1Size = 16;
-            int myBitsPerSample = 16;
-            int myFormat = 1;
-            long myChannels = 1;
-            long mySampleRate = 22100;
-            long myByteRate = mySampleRate * myChannels * myBitsPerSample / 8;
-            int myBlockAlign = (int) (myChannels * myBitsPerSample / 8);
-// Change this to pcmWave.length()
-            byte[] clipData = new byte[34]; //getBytesFromFile(fileToConvert);
 
-            long myDataSize = clipData.length;
-            long myChunk2Size = myDataSize * myChannels * myBitsPerSample / 8;
-            long myChunkSize = 36 + myChunk2Size;
 
-        //Convert  Method to store data to byte array instead of outputStream!
-            OutputStream os;
-            os = new FileOutputStream(new File("/sdcard/onefile/assessor/OneFile_Audio_" + newRecordingID + ".wav"));
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-            DataOutputStream outFile = new DataOutputStream(bos);
 
-            outFile.writeBytes("RIFF");                                 // 00 - RIFF
-            outFile.write(intToByteArray((int) myChunkSize), 0, 4);      // 04 - how big is the rest of this file?
-            outFile.writeBytes("WAVE");                                 // 08 - WAVE
-            outFile.writeBytes("fmt ");                                 // 12 - fmt 
-            outFile.write(intToByteArray((int) mySubChunk1Size), 0, 4);  // 16 - size of this chunk
-            outFile.write(shortToByteArray((short) myFormat), 0, 2);     // 20 - what is the audio format? 1 for PCM = Pulse Code Modulation
-            outFile.write(shortToByteArray((short) myChannels), 0, 2);   // 22 - mono or stereo? 1 or 2?  (or 5 or ???)
-            outFile.write(intToByteArray((int) mySampleRate), 0, 4);     // 24 - samples per second (numbers per second)
-            outFile.write(intToByteArray((int) myByteRate), 0, 4);       // 28 - bytes per second
-            outFile.write(shortToByteArray((short) myBlockAlign), 0, 2); // 32 - # of bytes in one sample, for all channels
-            outFile.write(shortToByteArray((short) myBitsPerSample), 0, 2);  // 34 - how many bits in a sample(number)?  usually 16 or 24
-            outFile.writeBytes("data");                                 // 36 - data
-            outFile.write(intToByteArray((int) myDataSize), 0, 4);       // 40 - how big is this data chunk
-            outFile.write(clipData);                                    // 44 - the actual data itself - just a long string of numbers
-
-            outFile.flush();
-            outFile.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private static byte[] intToByteArray(int i) {
-        byte[] b = new byte[4];
-        b[0] = (byte) (i & 0x00FF);
-        b[1] = (byte) ((i >> 8) & 0x000000FF);
-        b[2] = (byte) ((i >> 16) & 0x000000FF);
-        b[3] = (byte) ((i >> 24) & 0x000000FF);
-        return b;
-    }
-
-    // convert a short to a byte array
-    public static byte[] shortToByteArray(short data) {
-        /*
-         * NB have also tried:
-         * return new byte[]{(byte)(data & 0xff),(byte)((data >> 8) & 0xff)};
-         * 
-         */
-
-        return new byte[]{(byte) (data & 0xff), (byte) ((data >>> 8) & 0xff)};
-    }
 ////////////////////////////////////////////////////////////////////////////////
 // End of CODE From Stack Exchange                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -436,7 +256,6 @@ class PcmHeader
         OutputStream fullWave;
 
         testWave = createSilencePCM(1000, 44100); // create one second of PCM silence....
-        fullWave = createSilenceWave(1000, 44100);
 pcmWave = createSilencePCM(1000, 44100);
 waveWithHeader = createWaveHeaderForPcm(pcmWave, 44100, (short)16);
         
