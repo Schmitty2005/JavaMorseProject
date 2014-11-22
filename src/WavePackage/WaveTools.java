@@ -174,6 +174,8 @@ public class WaveTools {
 
             sliceValue = bb.getShort(s * 2);
             bb.putShort((s * 2), (short) (weight * sliceValue));     // Fade In
+            bb.putShort((s * 2), (short) (weight * sliceValue));                       // Fade In
+            System.out.println("S: " + s + "  Value: " + weight * sliceValue + "Short cast :" + (short) (weight * sliceValue));
 
             sliceValue = bb.getShort((pcmData.length - 4 - (2 * s)));
             bb.putShort((pcmData.length - (s * 2) - 4), (short) (sliceValue * weight));  // Fade Out
