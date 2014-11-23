@@ -22,10 +22,27 @@ import java.io.IOException;
  */
 public class WaveTools {
 
-    public double sampleRate = 44100;
+    public static int sampleRate = 44100;
     public int channels = 1; //currently only supports on channel. Maybe Later 
     public double volume = 27040; // just set a volume for now.
+/**
+     * combineByteArray simply combines the first and the second byte array as
+     * one.
+     *
+     * @param firstByte First byte array desired
+     * @param secondByte Second byte array to follow first
+     * @return Returns firstByte plus secondByte
+     */
+    public static byte[] combineByteArray(byte[] firstByte, byte[] secondByte) {
+        byte[] combinedArray = new byte[(firstByte.length + secondByte.length)];
+        ByteBuffer bb = ByteBuffer.wrap(combinedArray);
+        
+        bb.position(0);
+        bb.put(firstByte);
+        bb.put(secondByte);
 
+        return combinedArray;
+    }
     /**
      *
      * @param waveByteArray A byte array that you desire to save to a file.
@@ -175,8 +192,7 @@ public class WaveTools {
             sliceValue = bb.getShort(s * 2);
             bb.putShort((s * 2), (short) (weight * sliceValue));     // Fade In
             bb.putShort((s * 2), (short) (weight * sliceValue));                       // Fade In
-            System.out.println("S: " + s + "  Value: " + weight * sliceValue + "Short cast :" + (short) (weight * sliceValue));
-
+            
             sliceValue = bb.getShort((pcmData.length - 4 - (2 * s)));
             bb.putShort((pcmData.length - (s * 2) - 4), (short) (sliceValue * weight));  // Fade Out
         }
@@ -200,8 +216,9 @@ public class WaveTools {
         short tempvolume = 28800; // test value of volume!
         // This may not work......just an initial test run
         double calculate;
-        int numberSlices = duration_ms / 1000 * sampleRate;    //this may be wrong....just testing
-        //set up ByteBuffer
+        double calcSlices = (double)duration_ms / 1000D * (double)sampleRate;    //this may be wrong....just testing
+int numberSlices = (int)calcSlices;        
+//set up ByteBuffer
         ByteBuffer bb = ByteBuffer.allocate((numberSlices * 2)); //88200 is for testing purposes
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.asShortBuffer();
@@ -231,19 +248,22 @@ public class WaveTools {
      * @param sampleRate
      * @return An Output Stream is returned
      */
-    public static byte[] createSilencePCM(int duration_ms, int sampleRate) {
+    public static byte[] createSilencePCM(double duration_ms, double sampleRate) {
 
         //TODO Measure the time in profile of this method vs twiddle!
         //SUCCESS!  This method is only 0.23 milliseconds compared to 11.6mSeconds! YAY!
         // byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
-        ByteBuffer bb = ByteBuffer.allocate((duration_ms / 1000 * sampleRate) + 4);
+        ByteBuffer bb = ByteBuffer.allocate((int)(duration_ms / 1000 * sampleRate) *2);
         bb.asShortBuffer();
         bb.position(0);
-        for (int slice = 0; slice < (sampleRate / (duration_ms * 0.01)); slice++) {
+        //System.out.println("BB limit: " + bb.limit());
+        //System.out.println((int)(sampleRate / duration_ms * 0.01));
+        for (int slice = 0; slice < ((int)(duration_ms / 1000 * sampleRate))-2; slice++) {
             bb.putShort((short) 0);
+            //System.out.println("Slice: "+ slice);
 
         }
-        byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
+        byte[] bytePCMsilence = new byte[(int)(duration_ms / 1000 * sampleRate) * 2];
         bytePCMsilence = bb.array();
 
         /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
@@ -298,8 +318,31 @@ public class WaveTools {
         System.out.println(testWaveWithHeader.length);
         saveToWaveFile(testPCMsine, "testpcm.pcm");  // pcm data looks beautiful in audacity!
         saveToWaveFile(testWaveWithHeader, "testwave.wav"); // wave wont load :( in Audacity
-        createHannWindow(testPCMsine, 0.05F, 44100);
+        createHannWindow(testPCMsine, 0.005F, 44100);
         saveToWaveFile(testPCMsine, "pcmWithHann.pcm");
+        
+        byte[] ditByte;
+        byte [] dahByte;
+        byte [] interSpace ;
+        byte [] characterSPace ;
+        byte [] finishByte = null;
+        byte [] workingByte;
+        ditByte = createSinePCM((short)1000,(short)100, (short)0, 44100);
+        createHannWindow(ditByte, 0.005F, sampleRate);
+        dahByte = createSinePCM((short)1000,(short)300, (short)0, 44100);
+        createHannWindow(dahByte, 0.005F, sampleRate);
+        interSpace = createSilencePCM(100, 44100);
+        characterSPace = createSilencePCM(700, sampleRate);
+        
+        workingByte = combineByteArray(ditByte, interSpace);
+        finishByte=combineByteArray(workingByte, dahByte);
+        workingByte = combineByteArray(finishByte, interSpace);
+        
+        saveToWaveFile(workingByte, "combined");
+        
+        
+        
+                    
 //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
