@@ -89,7 +89,13 @@ public class WaveTools {
         //TODO this is for input into the createWaveHeaderForPcm sub!
         //TODO find out how to add a byte array to this !
     }
-
+public static void putUnsignedInt(ByteBuffer bb, long value) {
+    long test = value & 0x0000ffffL;
+    int tester = (int)test;
+    System.out.println(String.format("%02X", test));
+    System.out.println(String.format("%02X", tester));//String. poostring = (byte[])tester;
+    bb.putInt((int) (value & 0x0001ffffL));
+    }
     /**
      * This method accepts a byte array and creates and attaches a wave header
      * to the data.
@@ -145,11 +151,22 @@ public class WaveTools {
         waveBuffer.putInt(bitsPerSample);  //This is 16 for the bit-rate  ***WATCH FOR ERRORS HERE
         waveBuffer.putShort((short) 1);  //1 is for PCM 2   AudioFormat      PCM = 1 (i.e. Linear quantization)
         waveBuffer.putShort(numberChannels); //2   NumChannels      Mono = 1, Stereo = 2, etc.
-        waveBuffer.putInt(sampleRate);  //sample rate
-        waveBuffer.putInt(byteRate);//28        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
+        //WARNING !!  JAVA IS TRASH! I had to manually input these byte because there is no such thing
+        // as unsigned integers!  What kind of pile of shit is this?
+        byte[] comboRate = {0x44, (byte)0xac, (byte)0x00, (byte)0x00, (byte)0x88, 0x58, 0x01, (byte)0x00};
+        waveBuffer.put((byte[])comboRate);
+                    //putUnsignedInt(waveBuffer, (long)sampleRate);
+                    //putUnsignedInt(waveBuffer, (long)byteRate);
+                    //waveBuffer.putInt((int)((long)sampleRate & 0xffffffffL));  //sample rate This needs to be an Unsigned INT also!
+                    //waveBuffer.putInt((int)((long)byteRate & 0xffffffffL));//28 This needs to be an unsignedINT!        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
         waveBuffer.putShort(blockAlign);//2   BlockAlign       == NumChannels * BitsPerSample/8
         waveBuffer.putShort(bitsPerSample);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
-        waveBuffer.putShort((short) 0);  //extra parameter....not needed if PCM!
+//public static void putUnsignedInt(ByteBuffer bb, long value) {
+//        bb.putInt((int) (value & 0xffffffffL));
+//    }
+    
+        
+//waveBuffer.putShort((short) 0);  //extra parameter....not needed if PCM!
         //switch to big endian again
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
         //Subchunk2ID      Contains the letters "data"
@@ -338,10 +355,20 @@ int numberSlices = (int)calcSlices;
         finishByte=combineByteArray(workingByte, dahByte);
         workingByte = combineByteArray(finishByte, interSpace);
         
-        saveToWaveFile(workingByte, "combined");
+        saveToWaveFile(workingByte, "combined.pcm");
+        byte [] waveToSave;
+        waveToSave = createWaveHeaderForPcm(workingByte, (short)sampleRate, (short)16);
+        saveToWaveFile(waveToSave,"combined.wav");
         
         
-        
+       long unsignedInt = 44100;
+       unsignedInt = (unsignedInt * 2) & 0xffffffff;
+       System.out.println(unsignedInt);
+       System.out.println((int)unsignedInt);
+       ByteBuffer pooptester = ByteBuffer.allocate(32);
+       pooptester.putLong((int)unsignedInt);
+       byte [] hextest = pooptester.array();
+       System.out.println(hextest);
                     
 //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
