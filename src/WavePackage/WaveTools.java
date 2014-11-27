@@ -6,7 +6,6 @@
 package WavePackage;
 
 import java.io.*;
-import javax.sound.sampled.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 //these imports are for file saving
@@ -25,7 +24,8 @@ public class WaveTools {
     public static int sampleRate = 44100;
     public int channels = 1; //currently only supports on channel. Maybe Later 
     public double volume = 27040; // just set a volume for now.
-/**
+
+    /**
      * combineByteArray simply combines the first and the second byte array as
      * one.
      *
@@ -36,14 +36,17 @@ public class WaveTools {
     public static byte[] combineByteArray(byte[] firstByte, byte[] secondByte) {
         byte[] combinedArray = new byte[(firstByte.length + secondByte.length)];
         ByteBuffer bb = ByteBuffer.wrap(combinedArray);
-        
+
         bb.position(0);
         bb.put(firstByte);
         bb.put(secondByte);
 
         return combinedArray;
     }
+
     /**
+     * Saves a byte array as a file. Can be used to save wave files and PCM
+     * files
      *
      * @param waveByteArray A byte array that you desire to save to a file.
      * @param filename The filename you wish the file to have.
@@ -89,12 +92,13 @@ public class WaveTools {
         //TODO this is for input into the createWaveHeaderForPcm sub!
         //TODO find out how to add a byte array to this !
     }
-    
+
     /**
- * Used for writing Unsigned Integer to Byte Array.
- * @param out
- * @param val 
- */
+     * Used for writing Unsigned Integer to Byte Array.
+     *
+     * @param out
+     * @param val
+     */
     private static void writeInt(ByteBuffer buffer, int intToUnsign) {
 //TODO add suppress warning here
         buffer.put((byte) (intToUnsign >> 0));
@@ -163,22 +167,16 @@ public class WaveTools {
         waveBuffer.putShort(numberChannels); //2   NumChannels      Mono = 1, Stereo = 2, etc.
         //WARNING !!  JAVA IS TRASH! I had to manually input these byte because there is no such thing
         // as unsigned integers!  What kind of pile of shit is this?
-            //byte[] comboRate = {0x44, (byte)0xac, (byte)0x00, (byte)0x00, (byte)0x88, 0x58, 0x01, (byte)0x00};
-            //waveBuffer.put((byte[])comboRate);
+        //byte[] comboRate = {0x44, (byte)0xac, (byte)0x00, (byte)0x00, (byte)0x88, 0x58, 0x01, (byte)0x00};
+        //waveBuffer.put((byte[])comboRate);
         writeInt(waveBuffer, sampleRate);
         writeInt(waveBuffer, byteRate);
-                    //putUnsignedInt(waveBuffer, (long)sampleRate);
-                    //putUnsignedInt(waveBuffer, (long)byteRate);
-                    //waveBuffer.putInt((int)((long)sampleRate & 0xffffffffL));  //sample rate This needs to be an Unsigned INT also!
-                    //waveBuffer.putInt((int)((long)byteRate & 0xffffffffL));//28 This needs to be an unsignedINT!        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
+        //putUnsignedInt(waveBuffer, (long)sampleRate);
+        //putUnsignedInt(waveBuffer, (long)byteRate);
+        //waveBuffer.putInt((int)((long)sampleRate & 0xffffffffL));  //sample rate This needs to be an Unsigned INT also!
+        //waveBuffer.putInt((int)((long)byteRate & 0xffffffffL));//28 This needs to be an unsignedINT!        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
         waveBuffer.putShort(blockAlign);//2   BlockAlign       == NumChannels * BitsPerSample/8
         waveBuffer.putShort(bitsPerSample);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
-//public static void putUnsignedInt(ByteBuffer bb, long value) {
-//        bb.putInt((int) (value & 0xffffffffL));
-//    }
-    
-        
-//waveBuffer.putShort((short) 0);  //extra parameter....not needed if PCM!
         //switch to big endian again
         waveBuffer.order(ByteOrder.BIG_ENDIAN);
         //Subchunk2ID      Contains the letters "data"
@@ -231,6 +229,7 @@ public class WaveTools {
     }
 
     /**
+     * Creates a sine wave PCM byte array
      *
      * @param freq Desired frequency in hertz
      * @param duration_ms Duration of wave in milliseconds
@@ -245,8 +244,8 @@ public class WaveTools {
         short tempvolume = 28800; // test value of volume!
         // This may not work......just an initial test run
         double calculate;
-        double calcSlices = (double)duration_ms / 1000D * (double)sampleRate;    //this may be wrong....just testing
-int numberSlices = (int)calcSlices;        
+        double calcSlices = (double) duration_ms / 1000D * (double) sampleRate;    //this may be wrong....just testing
+        int numberSlices = (int) calcSlices;
 //set up ByteBuffer
         ByteBuffer bb = ByteBuffer.allocate((numberSlices * 2)); //88200 is for testing purposes
         bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -282,17 +281,17 @@ int numberSlices = (int)calcSlices;
         //TODO Measure the time in profile of this method vs twiddle!
         //SUCCESS!  This method is only 0.23 milliseconds compared to 11.6mSeconds! YAY!
         // byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
-        ByteBuffer bb = ByteBuffer.allocate((int)(duration_ms / 1000 * sampleRate) *2);
+        ByteBuffer bb = ByteBuffer.allocate((int) (duration_ms / 1000 * sampleRate) * 2);
         bb.asShortBuffer();
         bb.position(0);
         //System.out.println("BB limit: " + bb.limit());
         //System.out.println((int)(sampleRate / duration_ms * 0.01));
-        for (int slice = 0; slice < ((int)(duration_ms / 1000 * sampleRate))-2; slice++) {
+        for (int slice = 0; slice < ((int) (duration_ms / 1000 * sampleRate)) - 2; slice++) {
             bb.putShort((short) 0);
             //System.out.println("Slice: "+ slice);
 
         }
-        byte[] bytePCMsilence = new byte[(int)(duration_ms / 1000 * sampleRate) * 2];
+        byte[] bytePCMsilence = new byte[(int) (duration_ms / 1000 * sampleRate) * 2];
         bytePCMsilence = bb.array();
 
         /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
@@ -308,14 +307,36 @@ int numberSlices = (int)calcSlices;
         return bytePCMsilence;
     }
 
-////////////////////////////////////////////////////////////////////////////////
-// Start of CODE From Stack Exchange 
-//      http://stackoverflow.com/questions/9179536/writing-pcm-recorded-data-into-a-wav-file-java-android
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// End of CODE From Stack Exchange                                            //
-////////////////////////////////////////////////////////////////////////////////
     /**
+     * Mixes two PCM wave byte arrays into one track.
+     * UNTESTED!
+     * @param firstPCMwave
+     * @param secondPCMwave
+     * @return mixedPCM returns mixed byte array
+     */
+    public static byte[] mixTwoPCM(byte[] firstPCMwave, byte[] secondPCMwave) {
+
+        int byteLength = 0;
+
+        if (firstPCMwave.length >= secondPCMwave.length) {
+            byteLength = firstPCMwave.length;
+        } else {
+            byteLength = secondPCMwave.length;
+        }
+
+        byte[] mixedPCM = new byte[byteLength];
+        ByteBuffer bb = ByteBuffer.wrap(mixedPCM);
+
+        for (int step = 0; step < byteLength; step++) {
+            short slice = (short) ((firstPCMwave[step] / 2) + (secondPCMwave[step] / 2));
+            bb.putShort(slice);
+        }
+        return mixedPCM;
+    }
+
+    /**
+     * Main can be deleted after testing!
+     *
      * @param args No command line arguments available in class.
      */
     public static void main(String[] args) {
@@ -343,45 +364,44 @@ int numberSlices = (int)calcSlices;
 
 //Add wave Header to PCM
         byte[] testWaveWithHeader;
-        testWaveWithHeader = createWaveHeaderForPcm(testPCMsine,  44100, (short) 16);
+        testWaveWithHeader = createWaveHeaderForPcm(testPCMsine, 44100, (short) 16);
         System.out.println(testWaveWithHeader.length);
         saveToWaveFile(testPCMsine, "testpcm.pcm");  // pcm data looks beautiful in audacity!
         saveToWaveFile(testWaveWithHeader, "testwave.wav"); // wave wont load :( in Audacity
         createHannWindow(testPCMsine, 0.005F, 44100);
         saveToWaveFile(testPCMsine, "pcmWithHann.pcm");
-        
+
         byte[] ditByte;
-        byte [] dahByte;
-        byte [] interSpace ;
-        byte [] characterSPace ;
-        byte [] finishByte = null;
-        byte [] workingByte;
-        ditByte = createSinePCM((short)1000,(short)100, (short)0, 44100);
+        byte[] dahByte;
+        byte[] interSpace;
+        byte[] characterSPace;
+        byte[] finishByte = null;
+        byte[] workingByte;
+        ditByte = createSinePCM((short) 1000, (short) 100, (short) 0, 44100);
         createHannWindow(ditByte, 0.005F, sampleRate);
-        dahByte = createSinePCM((short)1000,(short)300, (short)0, 44100);
+        dahByte = createSinePCM((short) 1000, (short) 300, (short) 0, 44100);
         createHannWindow(dahByte, 0.005F, sampleRate);
         interSpace = createSilencePCM(100, 44100);
         characterSPace = createSilencePCM(700, sampleRate);
-        
+
         workingByte = combineByteArray(ditByte, interSpace);
-        finishByte=combineByteArray(workingByte, dahByte);
+        finishByte = combineByteArray(workingByte, dahByte);
         workingByte = combineByteArray(finishByte, interSpace);
-        
+
         saveToWaveFile(workingByte, "combined.pcm");
-        byte [] waveToSave;
-        waveToSave = createWaveHeaderForPcm(workingByte, sampleRate, (short)16);
-        saveToWaveFile(waveToSave,"combined.wav");
-        
-        
-       long unsignedInt = 44100;
-       unsignedInt = (unsignedInt * 2) & 0xffffffff;
-       System.out.println(unsignedInt);
-       System.out.println((int)unsignedInt);
-       ByteBuffer pooptester = ByteBuffer.allocate(32);
-       pooptester.putLong((int)unsignedInt);
-       byte [] hextest = pooptester.array();
-       System.out.println(hextest);
-                    
+        byte[] waveToSave;
+        waveToSave = createWaveHeaderForPcm(workingByte, sampleRate, (short) 16);
+        saveToWaveFile(waveToSave, "combined.wav");
+
+        long unsignedInt = 44100;
+        unsignedInt = (unsignedInt * 2) & 0xffffffff;
+        System.out.println(unsignedInt);
+        System.out.println((int) unsignedInt);
+        ByteBuffer pooptester = ByteBuffer.allocate(32);
+        pooptester.putLong((int) unsignedInt);
+      
+    
+
 //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
 
