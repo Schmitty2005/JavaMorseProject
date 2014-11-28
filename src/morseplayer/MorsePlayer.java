@@ -11,24 +11,8 @@ package morseplayer;
  */
 import javax.sound.sampled.*;
 import java.io.*;
-
-
-/* class Sound_Timing is used to hold variables for creation of morse
- * 
- * This class is basically an enum that holds the values assosiated with the timing of dit's and dah's
- *@author
- *Brian S.
- *@version 
- *Alpha
- */
-class DecodeMorse extends MorseDictionary{}
-
-
-class MorseTiming extends Sound_Timing{
-	//TODO explanation is the class needs to be private for MorsePlayer.  No need to be public in Morse_Player class
-	//Morse_Player class
-	 
- }
+import jdk.nashorn.internal.codegen.CompilerConstants;
+//import sun.font.TrueTypeFont; //WTF??? How did this get in?
 
 /**Class Descripition added right before class
  */
@@ -43,6 +27,7 @@ class MorseTiming extends Sound_Timing{
  * 
 * 
 */
+<<<<<<< HEAD
 class MorsePlayer {
 
 
@@ -55,6 +40,21 @@ class MorsePlayer {
 	private char charToPlay;
 	private String wordToPlay = null;
 	
+=======
+            
+Sound_Timing soundDurations = new Sound_Timing(12, 6, false);
+MorseDictionary DecodeDictionary = new MorseDictionary();  
+    
+private int frequency = 800;
+private int wordsPerMinute = 15;
+private boolean farnsworthSpacing = false;
+private char charToPlay;
+private String wordToPlay;
+
+        MorsePlayer() {
+            //Default Constructor
+        }
+>>>>>>> 549b2b5
 	
 	MorsePlayer (int WPM){
 		this.wordsPerMinute = WPM;
@@ -65,31 +65,75 @@ class MorsePlayer {
 		this.farnsworthSpacing = use_farnsworth;
 		this.frequency = freq_hz;
 	}
+        
 	MorsePlayer (int WPM, double freq_hz){
 		this.frequency = (int)freq_hz;
                 this.wordsPerMinute = WPM;
 	}
+        
 	MorsePlayer (boolean use_farnsworth){
 		this.farnsworthSpacing = use_farnsworth;
-	}
-	public static void main (String [] args){
-	//TODO main code....initialize sounds (create waveforms)
-	}
+	}	
 	
-	
-	
-	private void playDih (){
-	//TODO code to play dih sound
+        private static void playDit ()
+        {
+            System.out.println("Beep     - Dit beep");
+            //TODO code to play dit sound
 	}
-	private void playDah () {
-		//TODO code to play dah sound
+	private static void playDah ()
+        {
+            System.out.println("Beeeeeep - Dah beep");
+            //TODO code to play dah sound
 	}
 	public void playChar (char characterToPlay){
-	
-//TODO code to play morse character
+            //TODO for some reason, Dictionary was not working properly....may need '' instead of ""
+            String morseString = DecodeDictionary.morseDictionary.get (characterToPlay);
+            //String morseString = "...-.-";
+            int index = 0;
+            int stringLength = morseString.length();
+            while ( index < stringLength)
+            {
+                char morseElement = morseString.charAt(index);
+                    if (morseElement == '.')
+                        {
+                         playDit();
+                        }
+                    else if(morseElement == '-') 
+                        {
+                        playDah();
+                        }
+            index++;
+            }  //TODO code to play morse character --finished 11/10/2014
 	}
-	public void playWord (String WordtoPlay){
-		//TODO code to play string in morse	
+        
+	public void playWord (String wordToPlay)
+        {
+            int stringLength = wordToPlay.length();
+            String wordToPlayLowerCase = wordToPlay.toLowerCase();
+            int index = 0;
+            
+            while (index < stringLength)
+            {
+                char charToPlay = wordToPlayLowerCase.charAt(index);
+                playChar(charToPlay);
+                System.out.println("===================");
+                index ++;
+            //TODO remember to add code that accounts for spacing between words!
+            }//TODO code to play string in morse	
 	}
+        
+      public static void main (String [] args){
+
+    //String poop = DecodeDictionary.morseDictionary.get ("a");
+    
+
+
+//These are testing lines
+/*
+          
+          */
+//Testing lines end here.....
+//TODO main code....initialize sounds (create waveforms)
+	}  
 }
 	
