@@ -8,35 +8,38 @@ package morseplayer;
 import WavePackage.WaveTools;
 
 /**
- * This class contains all the variables for a morse element.
- *
+ * This class contains all the PCM data for all the  morse elements. The dit and dah waves
+ * are created using the constructor.  A user may set the frequency in hertz, 
+ * the desired words per minute, and whether or not farnsworth spacing is 
+ * to be enabled for the elements.
+ * 
+ * MorseElement.ditElementPCM - a PCM sine wave dit
+ * MorseElement.dahElementPCM - a PCM sine wave dah
+ * MorseElement.interCharacterPCM - a silent wave the length of space between morse characters.
+ * MorseElement.interCharacterFarnsworthPCM - a silent wave the length of space between morse characters in farnsworth spacing
  * @author bill
  */
 public class MorseElements {
 
-    int wordsPerMinute = 18;
-    short freqInHz = 800;
-    boolean farnsworthSpacing = false;
-    int sample_rate = 44100;
+    private int wordsPerMinute = 18;
+    private short freqInHz = 800;
+    private boolean farnsworthSpacing = false;
+    private int sample_rate = 44100;
     public byte[] ditElementPCM;
     public byte[] dahElementPCM;
     public byte[] interCharacterPCM;
-    byte[] constructionOnePCM;
-    byte[] constructionTwoPCM;
+    private byte[] constructionOnePCM;
+    private byte[] constructionTwoPCM;
     public byte[] interCharacterFarnsworthPCM;
 
     public MorseElements() {
     }
-    
-    class ElementInfo {
-    short freq;
-    int sample_rate;
-    short duration_ms;
-    
-    
-    };
-
-    
+    /**
+     * Creates PCM wave data and sound timing information for speed(WPM) and frequency.
+     * @param wordsPerMinute The desired speed of the morse code in words per minute
+     * @param freqInHz  The desired frequency of the cw tone in hertz.
+     * @param farnsworthSpacing True or False?  Farnsworth spacing enabled?
+     */
     public MorseElements(int wordsPerMinute, int freqInHz, boolean farnsworthSpacing) {
 
         Sound_Timing timing = new Sound_Timing(wordsPerMinute, freqInHz, farnsworthSpacing);
