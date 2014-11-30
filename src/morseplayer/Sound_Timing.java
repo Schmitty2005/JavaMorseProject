@@ -5,64 +5,61 @@
  */
 package morseplayer;
 
-/**
- *
- * @author bill
- */
 /*Sound_Timing class is used to calculate in milli-seconds the spacing used for dit's, dah's, inter-element,
  * and inter-character spacing
  *
  * @author
  * Brian S.
  */
+public class Sound_Timing {
 
-public class Sound_Timing 
-    {
-	 public double dit_length;
-	 public double dah_length;
-	 public double interElementSpacing;
-	 public double interCharacterSpacing_normal;
-	 public double interCharacterSpacing_farnsworth;
-	 public double interWordSpacing;
-         public boolean farnsworthSpacing = false;
-         public double farnsworthWPM = 13;
-	 // function used to calculate values of Sound_Timing class/enum
+    public double dit_length;
+    public double dah_length;
+    public double interElementSpacing;
+    public double interCharacterSpacing_normal;
+    public double interCharacterSpacing_farnsworth;
+    public double interWordSpacing;
+    public boolean farnsworthSpacing = false;
+    public double farnsworthWPM = 13;
+
+    // function used to calculate values of Sound_Timing class/enum
+
     /**
-     * 
-     * @param wpm
-     * wpm is speed in words per minute
+     *
+     * @param wpm wpm is speed in words per minute
      */
-         Sound_Timing (int wpm){
-        calculateSpacing(wpm);
+    Sound_Timing(int wpm) {
+        this.calculateSpacing(wpm);
     }
-    Sound_Timing (){
-        calculateSpacing (18);
-    }    
+
+    Sound_Timing() {
+        this.calculateSpacing(32);
+    }
+
     /**
-     * 
-     * @param wpm  using words per  minute
+     *
+     * @param wpm using words per minute
      * @param use_farnsworth boolean to use or not use farnsworth spacing
      */
-    Sound_Timing (int wpm, boolean use_farnsworth){
+    Sound_Timing(int wpm, boolean use_farnsworth) {
         this.farnsworthSpacing = use_farnsworth;
-        calculateSpacing (wpm);
+        this.calculateSpacing(wpm);
     }
-    Sound_Timing (int wpm, int farnsWPM, boolean use_farnsworth)
-    {
+
+    Sound_Timing(int wpm, int farnsWPM, boolean use_farnsworth) {
         this.farnsworthSpacing = use_farnsworth;
         this.farnsworthWPM = farnsWPM;
-        calculateSpacing (wpm);
+        this.calculateSpacing(wpm);
     }
-    private void calculateSpacing (int wpm)
-    {
-         //routine to calc WPM dit and dah lengths
-    this.dit_length= 1200 / wpm;
-    this.dah_length = dit_length * 3;
-    this.interElementSpacing = dit_length;
-    this.interWordSpacing  = dit_length * 7;
-    this.interCharacterSpacing_normal  = (dah_length - dit_length);
-    this.interCharacterSpacing_farnsworth = (1200 / farnsworthWPM)  * 7;
-    
+
+    private void calculateSpacing(int wpm) {
+        //routine to calc WPM dit and dah lengths
+        this.dit_length = 1200 / wpm;
+        this.dah_length = dit_length * 3;
+        this.interElementSpacing = dit_length;
+        this.interWordSpacing = dit_length * 7;
+        this.interCharacterSpacing_normal = (dah_length - dit_length);
+        this.interCharacterSpacing_farnsworth = (1200 / farnsworthWPM) * 7;
+
     }
 }
-
