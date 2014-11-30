@@ -23,12 +23,12 @@ import WavePackage.WaveTools;
  */
 public class MorseElements {
 
-    public boolean farnsworthSpacing ;// = false;
+    public boolean farnsworthSpacing;// = false;
     public byte[] ditElementPCM;
     public byte[] dahElementPCM;
     public byte[] interCharacterPCM;
     public byte[] interCharacterFarnsworthPCM;
-    
+
     private int wordsPerMinute = 32;
     private short freqInHz = 1200;
     private int sample_rate = 44100;

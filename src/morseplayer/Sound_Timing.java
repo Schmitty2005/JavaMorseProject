@@ -23,7 +23,6 @@ public class Sound_Timing {
     public double farnsworthWPM = 13;
 
     // function used to calculate values of Sound_Timing class/enum
-
     /**
      *
      * @param wpm wpm is speed in words per minute
@@ -33,7 +32,7 @@ public class Sound_Timing {
     }
 
     Sound_Timing() {
-        this.calculateSpacing(32);
+        this.calculateSpacing(18);
     }
 
     /**

@@ -7,9 +7,9 @@ package morseplayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import morseplayer.MorseDictionary;
-import morseplayer.MorseElements;
+//import java.nio.ByteBuffer;
+//import morseplayer.MorseDictionary;
+//import morseplayer.MorseElements;
 
 /**
  *
@@ -52,7 +52,7 @@ public class PlayMorse {
 
     ;
   
-    PlayMorse(String playString ) {
+    PlayMorse(String playString) {
 //@TODO call routine to play string in morse here!
     }
 
@@ -67,12 +67,12 @@ public class PlayMorse {
     ;
 public void playString(String playString) {
 //@TODO code to play string in morse :)
-    //@TODO NEEDS ByteArrayOutpuStream to work!
-    ByteArrayOutputStream bbout = new ByteArrayOutputStream();
-    
-    char charToPlay;    
-    int sLength = playString.length();
-        byte[]  playWave=  new byte [32];
+        //@TODO NEEDS ByteArrayOutpuStream to work!
+        ByteArrayOutputStream bbout = new ByteArrayOutputStream();
+
+        char charToPlay;
+        int sLength = playString.length();
+        byte[] playWave = new byte[32];
         //byte[]  constructionOne;
         //ByteBuffer bb = ByteBuffer.wrap(playWave);
         for (int step = 0; step < sLength; step++) {
@@ -82,60 +82,60 @@ public void playString(String playString) {
 //@TODO code to insert farnsworth spaced silence
                     bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.interCharacterFarnsworthPCM), 0, elements.interCharacterFarnsworthPCM.length);
                 } else {
-                    try{
-                    bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.interCharacterPCM));
+                    try {
+                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.interCharacterPCM));
+                    } catch (IOException e) {
+                        System.err.println("e");
                     }
-                    catch (IOException e) { System.err.println("e");
-                    }
-            
-                //playWave = constructionOne;
-            }
+
+                    //playWave = constructionOne;
+                }
             }
             char toLower = Character.toLowerCase(charToPlay);
             String morseString = morseDict.morseDictionary.get(toLower);
-                
-                for (int x = 0; x < (morseString.length()); x++) {
-                    char ditOrDah = morseString.charAt(x);
-                    if (ditOrDah == '.') {
-                        try{
-                            
+
+            for (int x = 0; x < (morseString.length()); x++) {
+                char ditOrDah = morseString.charAt(x);
+                if (ditOrDah == '.') {
+                    try {
+
                         bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.ditElementPCM));
-                        }
-                        catch (IOException e) {System.err.println(e);}
+                    } catch (IOException e) {
+                        System.err.println(e);
+                    }
 
                     //playWave = constructionOne;
 //@TODO code to place dit in playWave
-                    }
-                    if (ditOrDah == '-')
-                    
-                    {
+                }
+                if (ditOrDah == '-') {
                     try {
-                        bbout.write( WavePackage.WaveTools.combineByteArray(playWave, elements.dahElementPCM));
+                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.dahElementPCM));
+                    } catch (IOException e) {
+                        System.err.println(e);
                     }
-                    catch (IOException e) { System.err.println(e); }
 //playWave = constructionOne;
 //@TODO code to place dah in playWave
-                    }
-                
                 }
-                try {
-                    bbout.write(elements.interCharacterPCM);
-                }
-                catch (IOException e) {System.err.println(e);}
-                
+
+            }
+            try {
+                bbout.write(elements.interCharacterPCM);
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+
 //@TODO code to combine dit, dah, and spacing PCM's into new byte array
-            
-        
         }
 
-        playWave= bbout.toByteArray();
-            byte [] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short)16);
+        playWave = bbout.toByteArray();
+        byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short) 16);
         //byte [] saveWave = WavePackage.WaveTools.combineByteArray(header, playWave);
         WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
         WavePackage.WaveTools.saveToWaveFile(elements.ditElementPCM, "ditELementPCM.pcm");
         WavePackage.WaveTools.saveToWaveFile(elements.dahElementPCM, "dahElementPCM.pcm");
 
-}
+    }
+
     public static void main(String[] args) {
         PlayMorse morstest = new PlayMorse(24, "wkrp cq cq cq de wkrp");
         //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
