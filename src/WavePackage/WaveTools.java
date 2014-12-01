@@ -200,7 +200,7 @@ public class WaveTools {
      * @param sampleRate Sample rate of PCM data Byte Array
      */
     public static void createHannWindow(byte[] pcmData, float fadeTime, int sampleRate) {
-
+//TODO FIX THIS!
         ByteBuffer bb = ByteBuffer.wrap(pcmData);
 
         bb.asShortBuffer();
@@ -208,13 +208,15 @@ public class WaveTools {
 
         // Calculate duration, in samples, of fade time
         double numFadeSamples = fadeTime * sampleRate;
+        //possibly need to round this number?
         short sliceValue;
-        if (numFadeSamples > pcmData.length) {
-            numFadeSamples = pcmData.length;
-        }
+        //commented  out on 11-30-14 for testing    //if (numFadeSamples > pcmData.length) {
+            //    numFadeSamples = pcmData.length;
+            //}
         for (int s = 0; s < numFadeSamples; s++) {
             // Calculate weight based on Hann 'raised cosine' window
-            float weight = 0.5f * ((float) ((1 - ((float) Math.cos((float) Math.PI * (float) s / (float) (numFadeSamples - 1))))));
+            float weight = 0.5f * ((float) ((1 - ((float) Math.cos((float) Math.PI * (float) s / (float) (numFadeSamples ))))));
+//removed - 1 from (float)(numFadeSamples - 1)))))
 
             sliceValue = bb.getShort(s * 2);
             bb.putShort((s * 2), (short) (weight * sliceValue));     // Fade In
