@@ -8,10 +8,6 @@ package morseplayer;
  *
  * @author bill
  */
-import javax.sound.sampled.*;
-import java.io.*;
-import jdk.nashorn.internal.codegen.CompilerConstants;
-//import sun.font.TrueTypeFont; //WTF??? How did this get in?
 
 /**
  * Class Descripition added right before class
