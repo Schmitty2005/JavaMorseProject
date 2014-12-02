@@ -5,7 +5,11 @@
  */
 package morseplayer;
 
-/**
+/**MorseDictionary
+ * The MorseDictionary class is used to decode single characters into dits and dahs
+ * of morse code.  
+ * 
+ * The character is the key and the returned string is the dit, dah sequence.
  *
  * @author bill
  */
