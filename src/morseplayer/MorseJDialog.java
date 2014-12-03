@@ -114,7 +114,7 @@ MorsePlayer testMorse = new MorsePlayer(12, 400);
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         String testString = "test string";
-        testMorse.playWord(testString);
+        testMorse.playWord();
         
 // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
