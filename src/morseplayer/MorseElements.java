@@ -52,13 +52,13 @@ public class MorseElements {
         Sound_Timing timing = new Sound_Timing(wordsPerMinute, freqInHz, farnsworthSpacing);
 
         constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dit_length, (short) 0, sample_rate);
-        WaveTools.createHannWindow(constructionOnePCM, 0.02F, sample_rate);
+        WaveTools.createHannWindow(constructionOnePCM, 0.004F, sample_rate);
         constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_farnsworth, sample_rate);
         ditElementPCM = WavePackage.WaveTools.combineByteArray(constructionOnePCM, constructionTwoPCM);
 
         constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dah_length, (short) 0, sample_rate);
 
-        WaveTools.createHannWindow(constructionOnePCM, 0.02F, sample_rate);
+        WaveTools.createHannWindow(constructionOnePCM, 0.004F, sample_rate);
 
 
         constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interElementSpacing, sample_rate);

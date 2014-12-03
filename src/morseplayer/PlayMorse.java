@@ -7,11 +7,9 @@ package morseplayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-//import java.nio.ByteBuffer;
-//import morseplayer.MorseDictionary;
-//import morseplayer.MorseElements;
 
 /**
+ * PlayMorse is used to translate a string of characters into morse code.
  *
  * @author bill
  */
@@ -22,6 +20,11 @@ public class PlayMorse {
     private MorseElements elements = new MorseElements(32, 800, false);
     private MorseDictionary morseDict = new MorseDictionary();
 
+    /**
+     * PlayMorse wpm.
+     *
+     * @param mWPM WPM for the morse code speed.
+     */
     public PlayMorse(int mWPM) {
         Sound_Timing timing = new Sound_Timing(mWPM);
         this.elements = new MorseElements(mWPM, 800, false);
@@ -29,6 +32,11 @@ public class PlayMorse {
 
     ;
   
+    /**
+     * Initialize sounds for morse code playback.
+     * @param mWPM WPM of desired code playback.
+     * @param freq_hz desired frequency of morse code.
+     */
     PlayMorse(int mWPM, int freq_hz) {
         Sound_Timing timing = new Sound_Timing(mWPM);
         this.elements = new MorseElements(mWPM, freq_hz, false);
@@ -59,7 +67,7 @@ public class PlayMorse {
     ;
     PlayMorse(int mWPM, String mplayString) {
         //Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 400, false);
+        this.elements = new MorseElements(mWPM, 500, false);
         playString(mplayString);
         //@TODO call routine to play string in morse here!
     }
@@ -137,7 +145,7 @@ public void playString(String playString) {
     }
 
     public static void main(String[] args) {
-        PlayMorse morstest = new PlayMorse(24, "wkrp cq cq cq de wkrp");
+        PlayMorse morstest = new PlayMorse(38, "wkrp cq cq cq de wkrp");
         //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
     }
 }
