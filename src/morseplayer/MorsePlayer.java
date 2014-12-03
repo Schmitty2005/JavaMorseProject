@@ -82,7 +82,8 @@ class MorsePlayer {
             } else if (morseElement == '-') {
                 playDah();
             }
-
+        }
+    }
 
     public void playWord(String wordToPlay) {
         int stringLength = wordToPlay.length();
