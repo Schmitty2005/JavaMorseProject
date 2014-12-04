@@ -211,19 +211,18 @@ public class WaveTools {
         //possibly need to round this number?
         short sliceValue;
         //commented  out on 11-30-14 for testing    //if (numFadeSamples > pcmData.length) {
-            //    numFadeSamples = pcmData.length;
-            //}
+        //    numFadeSamples = pcmData.length;
+        //}
         for (int s = 0; s < numFadeSamples; s++) {
             // Calculate weight based on Hann 'raised cosine' window
-            float weight = 0.5f * ((float) ((1 - ((float) Math.cos((float) Math.PI * (float) s / (float) (numFadeSamples ))))));
-//removed - 1 from (float)(numFadeSamples - 1)))))
-
+            float weight = 0.5f * ((float) ((1 - ((float) Math.cos((float) Math.PI * (float) s / (float) (numFadeSamples))))));
+            //Fade In
             sliceValue = bb.getShort(s * 2);
-            bb.putShort((s * 2), (short) (weight * sliceValue));     // Fade In
             bb.putShort((s * 2), (short) (weight * sliceValue));                       // Fade In
-            //TODO fix this so there is no tail on end of wave! 
-            sliceValue = bb.getShort((pcmData.length - 4 - (2 * s)));
-            bb.putShort((pcmData.length - (s * 2) - 4), (short) (sliceValue * weight));  // Fade Out
+            //Fade Out
+            sliceValue = bb.getShort((pcmData.length - 2 - (2 * s)));
+            bb.putShort((pcmData.length - (s * 2) - 2), (short) (sliceValue * weight));  // Fade Out
+
         }
 
         //This code is in C for a hann window
@@ -239,34 +238,27 @@ public class WaveTools {
      * @param sampleRate Sample rate of PCM Data
      * @return
      */
-    public static byte[] createSinePCM(short freq, short duration_ms, short ramp_ms, int sampleRate) //@TODO all these parameters should be changed to doubles.
+    public static byte[] createSinePCM(short freq, short duration_ms, short volume_percent, int sampleRate) //@TODO all these parameters should be changed to doubles.
     {
-//@TODO add parameter for volume into function!
-
-        short tempvolume = 28800; // test value of volume!
+//@TODO add parameter for volume into function! Maybe use extends class?
+        double maxAmplitude_16bit = 32767;
+        short waveAmptude_16bit = 28800; // test value of volume! 0 to 32767 value
         // This may not work......just an initial test run
         double calculate;
         double calcSlices = (double) duration_ms / 1000D * (double) sampleRate;    //this may be wrong....just testing
         int numberSlices = (int) calcSlices;
-//set up ByteBuffer
+        //set up ByteBuffer
         ByteBuffer bb = ByteBuffer.allocate((numberSlices * 2)); //88200 is for testing purposes
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.asShortBuffer();
         bb.position(0);
         //Loop for sine wave
         for (int step = 0; step < numberSlices; step++) {
-            calculate = (Math.sin(freq * Math.PI * 2 * step / sampleRate) * tempvolume);
+            calculate = (Math.sin(freq * Math.PI * 2 * step / sampleRate) * waveAmptude_16bit);
             bb.putShort((short) (calculate));
         }
         byte[] bytePCMsine = bb.array();
-        /*
-         //this is for testing only....FOR statment and brackets can b 
-         // be deleted after testing shows it works.
-         for (int slot = 0; slot <150; slot++)
-         {short testout = bb.getShort(slot);
-         System.out.println("Slot: " + slot + " Value : "+ testout);
-         }
-         */
+
         return bytePCMsine;
 
     }
@@ -310,8 +302,8 @@ public class WaveTools {
     }
 
     /**
-     * Mixes two PCM wave byte arrays into one track.
-     * UNTESTED!
+     * Mixes two PCM wave byte arrays into one track. UNTESTED!
+     *
      * @param firstPCMwave
      * @param secondPCMwave
      * @return mixedPCM returns mixed byte array
@@ -336,8 +328,23 @@ public class WaveTools {
         return mixedPCM;
     }
 
+    public static void createWhiteNoise(byte[] noiseByteA) {
+        //TODO Create sub function for white noise PCM data
+    }
+
+    public static void setSampleRate(int newSampleRate) {
+
+        sampleRate = newSampleRate;
+    }
+
+    public static int getSampleRate() {
+
+        return sampleRate;
+
+    }
+
     /**
-     * Main can be deleted after testing!
+     * DONT USE! Just for testing! Main can be deleted after testing!
      *
      * @param args No command line arguments available in class.
      */
@@ -401,8 +408,6 @@ public class WaveTools {
         System.out.println((int) unsignedInt);
         ByteBuffer pooptester = ByteBuffer.allocate(32);
         pooptester.putLong((int) unsignedInt);
-      
-    
 
 //TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
     }
