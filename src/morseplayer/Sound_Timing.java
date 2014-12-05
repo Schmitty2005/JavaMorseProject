@@ -19,8 +19,8 @@ public class Sound_Timing {
     public double interCharacterSpacing_normal;
     public double interCharacterSpacing_farnsworth;
     public double interWordSpacing;
-    public boolean farnsworthSpacing = false;
-    public double farnsworthWPM = 13;
+    public boolean farnsworthSpacing ;//= false;
+    public double farnsworthWPM = 5;
 
     // function used to calculate values of Sound_Timing class/enum
     /**

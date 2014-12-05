@@ -28,6 +28,7 @@ public class MorseElements {
     public byte[] dahElementPCM;
     public byte[] interCharacterPCM;
     public byte[] interCharacterFarnsworthPCM;
+    public byte[] interWordSpacing;
 
     private int wordsPerMinute = 32;
     private short freqInHz = 1200;
@@ -47,13 +48,14 @@ public class MorseElements {
      * @param freqInHz The desired frequency of the cw tone in hertz.
      * @param farnsworthSpacing True or False? Farnsworth spacing enabled?
      */
-    public MorseElements(int wordsPerMinute, int freqInHz, boolean farnsworthSpacing) {
+    public MorseElements(int wordsPerMinute, int farnsWPM, boolean boolSpacing) {
 //@TODO possibly make these multithreaded in the future!
-        Sound_Timing timing = new Sound_Timing(wordsPerMinute, freqInHz, farnsworthSpacing);
+        Sound_Timing timing = new Sound_Timing(wordsPerMinute, farnsWPM, boolSpacing);
+        this.farnsworthSpacing = boolSpacing;
 
         constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dit_length, (short) 0, sample_rate);
         WaveTools.createHannWindow(constructionOnePCM, 0.004F, sample_rate);
-        constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_farnsworth, sample_rate);
+        constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interElementSpacing, sample_rate);
         ditElementPCM = WavePackage.WaveTools.combineByteArray(constructionOnePCM, constructionTwoPCM);
 
         constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dah_length, (short) 0, sample_rate);
@@ -67,6 +69,8 @@ public class MorseElements {
         interCharacterPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_normal, sample_rate);
 
         interCharacterFarnsworthPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_farnsworth, sample_rate);
+        
+        interWordSpacing = WavePackage.WaveTools.createSilencePCM(timing.interWordSpacing, sample_rate);
 
     }
 

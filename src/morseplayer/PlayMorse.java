@@ -17,7 +17,7 @@ public class PlayMorse {
 
     int mWPM;
     //Sound_Timing timing = new Sound_Timing(18);
-    private MorseElements elements = new MorseElements(32, 800, false);
+    private MorseElements elements = new MorseElements(32, 12, false);
     private MorseDictionary morseDict = new MorseDictionary();
 
     /**
@@ -27,7 +27,7 @@ public class PlayMorse {
      */
     public PlayMorse(int mWPM) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 800, false);
+        this.elements = new MorseElements(mWPM, 13, false);
     }
 
     ;
@@ -37,23 +37,24 @@ public class PlayMorse {
      * @param mWPM WPM of desired code playback.
      * @param freq_hz desired frequency of morse code.
      */
-    PlayMorse(int mWPM, int freq_hz) {
+    PlayMorse(int mWPM, int wpmFarns) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, freq_hz, false);
+        this.elements = new MorseElements(mWPM, wpmFarns, false);
     }
 
     ;
   
-    PlayMorse(int mWPM, int freq_hz, boolean farnsworthSpacing) {
+    PlayMorse(int mWPM, boolean farnsworthSpacing) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 800, farnsworthSpacing);
+        this.elements = new MorseElements(mWPM, 13, farnsworthSpacing); // 13 can be changed to default value later mDefaulFarnsWPM = 13
     }
 
     ;
   
-    PlayMorse(int mWPM, int freq_hz, boolean farnsworthSpacing, String playString) {
+    PlayMorse(int mWPM, int wpmFarns, boolean use_farnsworth, String playString) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, freq_hz, farnsworthSpacing);
+        this.elements = new MorseElements(mWPM, wpmFarns, use_farnsworth);
+        playString(playString);
         //@TODO call routine to play string in morse here!
 
     }
@@ -67,13 +68,13 @@ public class PlayMorse {
     ;
     PlayMorse(int mWPM, String mplayString) {
         //Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 500, false);
+        this.elements = new MorseElements(mWPM, 15, false);
         playString(mplayString);
         //@TODO call routine to play string in morse here!
     }
 
     ;
-public void playString(String playString) {
+private void playString(String playString) {
 //@TODO code to play string in morse :)
         //@TODO NEEDS ByteArrayOutpuStream to work!
         ByteArrayOutputStream bbout = new ByteArrayOutputStream();
@@ -86,12 +87,15 @@ public void playString(String playString) {
         for (int step = 0; step < sLength; step++) {
             charToPlay = playString.charAt(step);
             if (charToPlay == ' ') {
-                if (elements.farnsworthSpacing) {
+                bbout.write(WavePackage.WaveTools.combineByteArray(playWave, this.elements.interWordSpacing), 0, elements.interWordSpacing.length);
+
+            } else {
+                if (this.elements.farnsworthSpacing) {
 //@TODO code to insert farnsworth spaced silence
-                    bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.interCharacterFarnsworthPCM), 0, elements.interCharacterFarnsworthPCM.length);
+                    bbout.write(WavePackage.WaveTools.combineByteArray(playWave, this.elements.interCharacterFarnsworthPCM), 0, elements.interCharacterFarnsworthPCM.length);
                 } else {
                     try {
-                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.interCharacterPCM));
+                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, this.elements.interCharacterPCM));
                     } catch (IOException e) {
                         System.err.println("e");
                     }
@@ -107,7 +111,7 @@ public void playString(String playString) {
                 if (ditOrDah == '.') {
                     try {
 
-                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.ditElementPCM));
+                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, this.elements.ditElementPCM));
                     } catch (IOException e) {
                         System.err.println(e);
                     }
@@ -117,7 +121,7 @@ public void playString(String playString) {
                 }
                 if (ditOrDah == '-') {
                     try {
-                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, elements.dahElementPCM));
+                        bbout.write(WavePackage.WaveTools.combineByteArray(playWave, this.elements.dahElementPCM));
                     } catch (IOException e) {
                         System.err.println(e);
                     }
@@ -127,7 +131,7 @@ public void playString(String playString) {
 
             }
             try {
-                bbout.write(elements.interCharacterPCM);
+                bbout.write(this.elements.interCharacterPCM);
             } catch (IOException e) {
                 System.err.println(e);
             }
@@ -139,13 +143,30 @@ public void playString(String playString) {
         byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short) 16);
         //byte [] saveWave = WavePackage.WaveTools.combineByteArray(header, playWave);
         WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
-        WavePackage.WaveTools.saveToWaveFile(elements.ditElementPCM, "ditELementPCM.pcm");
-        WavePackage.WaveTools.saveToWaveFile(elements.dahElementPCM, "dahElementPCM.pcm");
+        WavePackage.WaveTools.saveToWaveFile(this.elements.ditElementPCM, "ditELementPCM.pcm");
+        WavePackage.WaveTools.saveToWaveFile(this.elements.dahElementPCM, "dahElementPCM.pcm");
 
+    }
+
+    private static void printElementInfo() {
+        /*
+         Sound_Timing testTime = new Sound_Timing(24, 12, true);
+        
+         System.out.println("Dit Spacing        : " + testTime.dit_length);
+         System.out.println("Dah Spacing        : "+ testTime.dah_length);
+         System.out.println("Element Spacing    : "+ testTime.interElementSpacing);
+         System.out.println("Farnswooth Boolean : "+ testTime.farnsworthSpacing);
+         System.out.println("Farnsworth WPM     : "+testTime.farnsworthWPM);
+         System.out.println("Farnsworth spacing : "+testTime.interCharacterSpacing_farnsworth);
+         System.out.println("Regular Spacing    : "+testTime.interCharacterSpacing_normal);
+         System.out.println("Word Spacing       : "+testTime.interWordSpacing);
+         */
     }
 
     public static void main(String[] args) {
-        PlayMorse morstest = new PlayMorse(38, "wkrp cq cq cq de wkrp");
+        //printElementInfo();
+        PlayMorse morstest = new PlayMorse(24, 12, true, "andrea is calling");
         //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
     }
+
 }
