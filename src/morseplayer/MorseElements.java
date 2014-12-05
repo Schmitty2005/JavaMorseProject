@@ -30,11 +30,20 @@ public class MorseElements {
     public byte[] interCharacterFarnsworthPCM;
     public byte[] interWordSpacing;
 
-    private int wordsPerMinute = 32;
-    private short freqInHz = 1200;
+    private int mWordsPerMinute = 32;
+    private short mfreqInHz = 300;
     private int sample_rate = 44100;
+    private int mFarnsWPM = 12;
     private byte[] constructionOnePCM;
     private byte[] constructionTwoPCM;
+
+    public void setToneFrequency(int new_freq_hz) {
+        this.mfreqInHz = (short) new_freq_hz;
+    }
+
+    public short getToneFrequency() {
+        return this.mfreqInHz;
+    }
 
     public MorseElements() {
     }
@@ -49,19 +58,22 @@ public class MorseElements {
      * @param farnsworthSpacing True or False? Farnsworth spacing enabled?
      */
     public MorseElements(int wordsPerMinute, int farnsWPM, boolean boolSpacing) {
+
+        this.mWordsPerMinute = wordsPerMinute;
+        this.mFarnsWPM = farnsWPM;
+
 //@TODO possibly make these multithreaded in the future!
         Sound_Timing timing = new Sound_Timing(wordsPerMinute, farnsWPM, boolSpacing);
         this.farnsworthSpacing = boolSpacing;
 
-        constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dit_length, (short) 0, sample_rate);
+        constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) mfreqInHz, (short) timing.dit_length, (short) 0, sample_rate);
         WaveTools.createHannWindow(constructionOnePCM, 0.004F, sample_rate);
         constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interElementSpacing, sample_rate);
         ditElementPCM = WavePackage.WaveTools.combineByteArray(constructionOnePCM, constructionTwoPCM);
 
-        constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) freqInHz, (short) timing.dah_length, (short) 0, sample_rate);
+        constructionOnePCM = WavePackage.WaveTools.createSinePCM((short) mfreqInHz, (short) timing.dah_length, (short) 0, sample_rate);
 
         WaveTools.createHannWindow(constructionOnePCM, 0.004F, sample_rate);
-
 
         constructionTwoPCM = WavePackage.WaveTools.createSilencePCM(timing.interElementSpacing, sample_rate);
         dahElementPCM = WavePackage.WaveTools.combineByteArray(constructionOnePCM, constructionTwoPCM);
@@ -69,8 +81,11 @@ public class MorseElements {
         interCharacterPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_normal, sample_rate);
 
         interCharacterFarnsworthPCM = WavePackage.WaveTools.createSilencePCM(timing.interCharacterSpacing_farnsworth, sample_rate);
-        
+
         interWordSpacing = WavePackage.WaveTools.createSilencePCM(timing.interWordSpacing, sample_rate);
+
+        //remeber to add code to dispose of unused byte arrays.
+        System.gc();
 
     }
 

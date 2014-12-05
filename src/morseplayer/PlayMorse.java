@@ -165,7 +165,7 @@ private void playString(String playString) {
 
     public static void main(String[] args) {
         //printElementInfo();
-        PlayMorse morstest = new PlayMorse(24, 12, true, "andrea is calling");
+        PlayMorse morstest = new PlayMorse(24, 12, false, "andrea is calling");
         //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
     }
 
