@@ -51,14 +51,14 @@ public class Sound_Timing {
         this.calculateSpacing(wpm);
     }
 
-    private void calculateSpacing(int wpm) {
+    private  void calculateSpacing(int wpm) {
         //routine to calc WPM dit and dah lengths
         this.dit_length = 1200 / wpm;
-        this.dah_length = dit_length * 3;
-        this.interElementSpacing = dit_length;
-        this.interWordSpacing = dit_length * 7;
-        this.interCharacterSpacing_normal = (dah_length - dit_length);
-        this.interCharacterSpacing_farnsworth = (1200 / farnsworthWPM) * 7;
+        this.dah_length = this.dit_length * 3;
+        this.interElementSpacing = this.dit_length;
+        this.interWordSpacing = (this.dit_length * 6);
+        this.interCharacterSpacing_normal = (this.dah_length - this.dit_length);
+        this.interCharacterSpacing_farnsworth = ((1200 / this.farnsworthWPM) * 7)-this.dit_length;
 
     }
 }

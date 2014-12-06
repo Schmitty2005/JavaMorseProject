@@ -5,8 +5,11 @@
  */
 package morseplayer;
 
+import WavePackage.PlayByteWaveAudio;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * PlayMorse is used to translate a string of characters into morse code.
@@ -54,7 +57,9 @@ public class PlayMorse {
     PlayMorse(int mWPM, int wpmFarns, boolean use_farnsworth, String playString) {
         Sound_Timing timing = new Sound_Timing(mWPM);
         this.elements = new MorseElements(mWPM, wpmFarns, use_farnsworth);
-        playString(playString);
+        synchronized (this) {
+            playString(playString);
+        }
         //@TODO call routine to play string in morse here!
 
     }
@@ -130,21 +135,16 @@ private void playString(String playString) {
                 }
 
             }
-            try {
-                bbout.write(this.elements.interCharacterPCM);
-            } catch (IOException e) {
-                System.err.println(e);
-            }
 
 //@TODO code to combine dit, dah, and spacing PCM's into new byte array
         }
 
         playWave = bbout.toByteArray();
         byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short) 16);
-        //byte [] saveWave = WavePackage.WaveTools.combineByteArray(header, playWave);
+
         WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
-        WavePackage.WaveTools.saveToWaveFile(this.elements.ditElementPCM, "ditELementPCM.pcm");
-        WavePackage.WaveTools.saveToWaveFile(this.elements.dahElementPCM, "dahElementPCM.pcm");
+
+        WavePackage.PlayByteWaveAudio player = new WavePackage.PlayByteWaveAudio(header);
 
     }
 
@@ -165,8 +165,15 @@ private void playString(String playString) {
 
     public static void main(String[] args) {
         //printElementInfo();
-        PlayMorse morstest = new PlayMorse(24, 12, false, "andrea is calling");
-        //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
+        PlayMorse morstest = new PlayMorse(45, 25, false, "Andrea is calling");
+        System.out.println("Waiting for enter.....");
+        try {
+            System.in.read();
+
+            //morstest.playString("ke7gbt cq cq cq ke7gbt dx de ke7gbt cq cq cq");
+        } catch (IOException ex) {
+            Logger.getLogger(PlayMorse.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

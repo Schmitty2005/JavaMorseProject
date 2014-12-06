@@ -30,8 +30,8 @@ public class MorseElements {
     public byte[] interCharacterFarnsworthPCM;
     public byte[] interWordSpacing;
 
-    private int mWordsPerMinute = 32;
-    private short mfreqInHz = 300;
+    private int mWordsPerMinute = 18;
+    private short mfreqInHz = 500;
     private int sample_rate = 44100;
     private int mFarnsWPM = 12;
     private byte[] constructionOnePCM;
@@ -39,6 +39,7 @@ public class MorseElements {
 
     public void setToneFrequency(int new_freq_hz) {
         this.mfreqInHz = (short) new_freq_hz;
+       //MorseElements this  = new MorseElements(mWordsPerMinute, mFarnsWPM, farnsworthSpacing);
     }
 
     public short getToneFrequency() {
