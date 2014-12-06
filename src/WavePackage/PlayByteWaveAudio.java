@@ -10,6 +10,8 @@ import java.io.IOException;
 import javax.sound.sampled.*;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,28 +23,26 @@ public class PlayByteWaveAudio {
         System.err.println("Need Byte Array with wave file data! ");
     }
 
-    public  PlayByteWaveAudio(byte[] playWave) {
-        InputStream byteArray = new ByteArrayInputStream(playWave);
-        System.out.println("ACCESSING WAVE BYTE PLAYER");
+    public PlayByteWaveAudio(byte[] playWave) {
         
+            InputStream byteArray = new ByteArrayInputStream(playWave);
 
-    //AudioSystem.write(ais, Type.WAVE, NewfilePath);
-        try {
-AudioInputStream ais = AudioSystem.getAudioInputStream(byteArray);
-            Clip clip = AudioSystem.getClip();
+            try {
+                AudioInputStream ais = AudioSystem.getAudioInputStream(byteArray);
+                Clip clip = AudioSystem.getClip();
 
-            if (ais == null){}
-            //This works but needs to sync with the rest of the program! WTF!
-            //ais is not created quick enough!
-            clip.open(ais);
-            clip.start();
-            clip.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
-            System.out.println(e);
-        }
-        catch (UnsupportedAudioFileException e) {System.out.println(e);}
+                clip.open(ais);
+                        clip.setFramePosition(0);
+                clip.start();
+                System.out.println("Clip Length" + clip.getBufferSize());
+                if (clip.isActive()){System.out.println("ACTIVE");}
+                
+                clip.drain();
+            } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+                System.out.println(e);
+            }
+        
+    }
+    
     }
 
-}
