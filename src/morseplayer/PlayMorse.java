@@ -20,7 +20,7 @@ public class PlayMorse {
 
     int mWPM;
     //Sound_Timing timing = new Sound_Timing(18);
-    private MorseElements elements = new MorseElements(32, 12, false);
+    private MorseElements elements = new MorseElements(32, 12, false, 800);
     private MorseDictionary morseDict = new MorseDictionary();
 
     /**
@@ -30,7 +30,7 @@ public class PlayMorse {
      */
     public PlayMorse(int mWPM) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 13, false);
+        this.elements = new MorseElements(mWPM, 13, false, 800);
     }
 
     ;
@@ -42,21 +42,31 @@ public class PlayMorse {
      */
     PlayMorse(int mWPM, int wpmFarns) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, wpmFarns, false);
+        this.elements = new MorseElements(mWPM, wpmFarns, false, 800);
     }
 
     ;
   
     PlayMorse(int mWPM, boolean farnsworthSpacing) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 13, farnsworthSpacing); // 13 can be changed to default value later mDefaulFarnsWPM = 13
+        this.elements = new MorseElements(mWPM, 13, farnsworthSpacing, 800); // 13 can be changed to default value later mDefaulFarnsWPM = 13
     }
 
     ;
   
     PlayMorse(int mWPM, int wpmFarns, boolean use_farnsworth, String playString) {
         Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, wpmFarns, use_farnsworth);
+        this.elements = new MorseElements(mWPM, wpmFarns, use_farnsworth, 800);
+        synchronized (this) {
+            playString(playString);
+        }
+        //@TODO call routine to play string in morse here!
+
+    }
+    
+    PlayMorse(int mWPM, int wpmFarns, boolean use_farnsworth, int freqHz,  String playString) {
+        Sound_Timing timing = new Sound_Timing(mWPM);
+        this.elements = new MorseElements(mWPM, wpmFarns, use_farnsworth, freqHz);
         synchronized (this) {
             playString(playString);
         }
@@ -73,7 +83,7 @@ public class PlayMorse {
     ;
     PlayMorse(int mWPM, String mplayString) {
         //Sound_Timing timing = new Sound_Timing(mWPM);
-        this.elements = new MorseElements(mWPM, 15, false);
+        this.elements = new MorseElements(mWPM, 15, false, 800);
         playString(mplayString);
         //@TODO call routine to play string in morse here!
     }
@@ -121,8 +131,6 @@ private void playString(String playString) {
                         System.err.println(e);
                     }
 
-                    //playWave = constructionOne;
-//@TODO code to place dit in playWave
                 }
                 if (ditOrDah == '-') {
                     try {
@@ -130,19 +138,17 @@ private void playString(String playString) {
                     } catch (IOException e) {
                         System.err.println(e);
                     }
-//playWave = constructionOne;
-//@TODO code to place dah in playWave
+
                 }
 
             }
 
-//@TODO code to combine dit, dah, and spacing PCM's into new byte array
         }
 
         playWave = bbout.toByteArray();
         byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short) 16);
 
-        WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
+        //WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
 
         WavePackage.PlayByteWaveAudio player = new WavePackage.PlayByteWaveAudio(header);
 
@@ -167,6 +173,16 @@ private void playString(String playString) {
         //printElementInfo();
         PlayMorse morstest = new PlayMorse(45, 25, false, "Andrea is calling");
         System.out.println("Waiting for enter.....");
+        
+        
+        PlayMorse othertest = new PlayMorse (18, 10, true, "Ke7gbt cq cq cq de ke7gbt");
+        
+        PlayMorse newTester = new PlayMorse (52, 12, false, 1500, "THIS is a test of morse");
+        PlayMorse abnewTester = new PlayMorse (23, 12, false, 400, "this is another test");
+        PlayMorse bnewTester = new PlayMorse (31, 12, false, 834, "how many can play at once");
+        PlayMorse cnewTester = new PlayMorse (18, 12, false, 1032, "another bunch of morse code");
+        
+        
         try {
             System.in.read();
 

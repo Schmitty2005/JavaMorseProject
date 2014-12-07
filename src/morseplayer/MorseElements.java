@@ -58,11 +58,11 @@ public class MorseElements {
      * @param freqInHz The desired frequency of the cw tone in hertz.
      * @param farnsworthSpacing True or False? Farnsworth spacing enabled?
      */
-    public MorseElements(int wordsPerMinute, int farnsWPM, boolean boolSpacing) {
+    public MorseElements(int wordsPerMinute, int farnsWPM, boolean boolSpacing, int freqHz) {
 
         this.mWordsPerMinute = wordsPerMinute;
         this.mFarnsWPM = farnsWPM;
-
+        this.mfreqInHz = (short)freqHz;
 //@TODO possibly make these multithreaded in the future!
         Sound_Timing timing = new Sound_Timing(wordsPerMinute, farnsWPM, boolSpacing);
         this.farnsworthSpacing = boolSpacing;
