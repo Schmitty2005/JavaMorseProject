@@ -83,10 +83,10 @@ public class WaveTools {
     }
 
     class PcmHeader {
-
-        int mSampleRate = 44100;
+        //int mSampleRate = 44100;
+        //int mSampleRate = 16000;
         short mChannels = 1;
-        short mBitsPerSample = 16;
+        //short mBitsPerSample = 16;
         String mWaveName;
         String mFileName = mWaveName + ".wav";
         //TODO this is for input into the createWaveHeaderForPcm sub!
@@ -101,7 +101,7 @@ public class WaveTools {
      */
     private static void writeInt(ByteBuffer buffer, int intToUnsign) {
 //TODO add suppress warning here
-        buffer.put((byte) (intToUnsign >> 0));
+        buffer.put((byte) (intToUnsign));
         buffer.put((byte) (intToUnsign >> 8));
         buffer.put((byte) (intToUnsign >> 16));
         buffer.put((byte) (intToUnsign >> 24));
@@ -233,8 +233,8 @@ public class WaveTools {
      * Creates a sine wave PCM byte array
      *
      * @param freq Desired frequency in hertz
+     * @param volume_percent percent of desired volume 0 to 100
      * @param duration_ms Duration of wave in milliseconds
-     * @param ramp_ms depracated!
      * @param sampleRate Sample rate of PCM Data
      * @return
      */
@@ -285,7 +285,7 @@ public class WaveTools {
             //System.out.println("Slice: "+ slice);
 
         }
-        byte[] bytePCMsilence = new byte[(int) (duration_ms / 1000 * sampleRate) * 2];
+        byte[] bytePCMsilence;// = new byte[(int) (duration_ms / 1000 * sampleRate) * 2];
         bytePCMsilence = bb.array();
 
         /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
@@ -310,7 +310,7 @@ public class WaveTools {
      */
     public static byte[] mixTwoPCM(byte[] firstPCMwave, byte[] secondPCMwave) {
 
-        int byteLength = 0;
+        int byteLength;
 
         if (firstPCMwave.length >= secondPCMwave.length) {
             byteLength = firstPCMwave.length;
@@ -384,7 +384,7 @@ public class WaveTools {
         byte[] dahByte;
         byte[] interSpace;
         byte[] characterSPace;
-        byte[] finishByte = null;
+        byte[] finishByte;// = null;
         byte[] workingByte;
         ditByte = createSinePCM((short) 1000, (short) 100, (short) 0, 44100);
         createHannWindow(ditByte, 0.005F, sampleRate);
