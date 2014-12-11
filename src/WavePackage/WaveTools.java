@@ -83,10 +83,10 @@ public class WaveTools {
     }
 
     class PcmHeader {
-
-        int mSampleRate = 44100;
+        //int mSampleRate = 44100;
+        //int mSampleRate = 16000;
         short mChannels = 1;
-        short mBitsPerSample = 16;
+        //short mBitsPerSample = 16;
         String mWaveName;
         String mFileName = mWaveName + ".wav";
         //TODO this is for input into the createWaveHeaderForPcm sub!
