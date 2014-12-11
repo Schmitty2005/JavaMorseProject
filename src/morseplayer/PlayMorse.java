@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package morseplayer;
-
+// To change sample rate, you must change MorseElements.java PlayMorse.java and WaveTools.java to the same rate.  Currently at 16000 for android!
 import WavePackage.PlayByteWaveAudio;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -146,9 +146,9 @@ private void playString(String playString) {
         }
 
         playWave = bbout.toByteArray();
-        byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 44100, (short) 16);
+        byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 16000, (short) 16);
 
-        //WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
+        WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
 
         WavePackage.PlayByteWaveAudio player = new WavePackage.PlayByteWaveAudio(header);
 
