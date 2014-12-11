@@ -32,7 +32,8 @@ public class MorseElements {
 
     private int mWordsPerMinute = 18;
     private short mfreqInHz = 500;
-    private int sample_rate = 44100;
+    //private int sample_rate = 44100;
+    final private int sample_rate = 16000;
     private int mFarnsWPM = 12;
     private byte[] constructionOnePCM;
     private byte[] constructionTwoPCM;
