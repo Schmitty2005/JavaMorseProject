@@ -83,10 +83,10 @@ public class WaveTools {
     }
 
     class PcmHeader {
-
-        int mSampleRate = 44100;
+        //int mSampleRate = 44100;
+        //int mSampleRate = 16000;
         short mChannels = 1;
-        short mBitsPerSample = 16;
+        //short mBitsPerSample = 16;
         String mWaveName;
         String mFileName = mWaveName + ".wav";
         //TODO this is for input into the createWaveHeaderForPcm sub!
@@ -101,7 +101,7 @@ public class WaveTools {
      */
     private static void writeInt(ByteBuffer buffer, int intToUnsign) {
 //TODO add suppress warning here
-        buffer.put((byte) (intToUnsign >> 0));
+        buffer.put((byte) (intToUnsign));
         buffer.put((byte) (intToUnsign >> 8));
         buffer.put((byte) (intToUnsign >> 16));
         buffer.put((byte) (intToUnsign >> 24));
@@ -165,16 +165,8 @@ public class WaveTools {
         waveBuffer.putInt(bitsPerSample);  //This is 16 for the bit-rate  ***WATCH FOR ERRORS HERE
         waveBuffer.putShort((short) 1);  //1 is for PCM 2   AudioFormat      PCM = 1 (i.e. Linear quantization)
         waveBuffer.putShort(numberChannels); //2   NumChannels      Mono = 1, Stereo = 2, etc.
-        //WARNING !!  JAVA IS TRASH! I had to manually input these byte because there is no such thing
-        // as unsigned integers!  What kind of pile of shit is this?
-        //byte[] comboRate = {0x44, (byte)0xac, (byte)0x00, (byte)0x00, (byte)0x88, 0x58, 0x01, (byte)0x00};
-        //waveBuffer.put((byte[])comboRate);
         writeInt(waveBuffer, sampleRate);
         writeInt(waveBuffer, byteRate);
-        //putUnsignedInt(waveBuffer, (long)sampleRate);
-        //putUnsignedInt(waveBuffer, (long)byteRate);
-        //waveBuffer.putInt((int)((long)sampleRate & 0xffffffffL));  //sample rate This needs to be an Unsigned INT also!
-        //waveBuffer.putInt((int)((long)byteRate & 0xffffffffL));//28 This needs to be an unsignedINT!        4   ByteRate         == SampleRate * NumChannels * BitsPerSample/8
         waveBuffer.putShort(blockAlign);//2   BlockAlign       == NumChannels * BitsPerSample/8
         waveBuffer.putShort(bitsPerSample);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
         //switch to big endian again
@@ -200,7 +192,7 @@ public class WaveTools {
      * @param sampleRate Sample rate of PCM data Byte Array
      */
     public static void createHannWindow(byte[] pcmData, float fadeTime, int sampleRate) {
-//TODO FIX THIS!
+
         ByteBuffer bb = ByteBuffer.wrap(pcmData);
 
         bb.asShortBuffer();
@@ -208,11 +200,8 @@ public class WaveTools {
 
         // Calculate duration, in samples, of fade time
         double numFadeSamples = fadeTime * sampleRate;
-        //possibly need to round this number?
         short sliceValue;
-        //commented  out on 11-30-14 for testing    //if (numFadeSamples > pcmData.length) {
-        //    numFadeSamples = pcmData.length;
-        //}
+
         for (int s = 0; s < numFadeSamples; s++) {
             // Calculate weight based on Hann 'raised cosine' window
             float weight = 0.5f * ((float) ((1 - ((float) Math.cos((float) Math.PI * (float) s / (float) (numFadeSamples))))));
@@ -233,22 +222,21 @@ public class WaveTools {
      * Creates a sine wave PCM byte array
      *
      * @param freq Desired frequency in hertz
+     * @param volume_percent percent of desired volume 0 to 100
      * @param duration_ms Duration of wave in milliseconds
-     * @param ramp_ms depracated!
      * @param sampleRate Sample rate of PCM Data
      * @return
      */
     public static byte[] createSinePCM(short freq, short duration_ms, short volume_percent, int sampleRate) //@TODO all these parameters should be changed to doubles.
     {
-//@TODO add parameter for volume into function! Maybe use extends class?
+
         double maxAmplitude_16bit = 32767;
         short waveAmptude_16bit = 28800; // test value of volume! 0 to 32767 value
-        // This may not work......just an initial test run
         double calculate;
-        double calcSlices = (double) duration_ms / 1000D * (double) sampleRate;    //this may be wrong....just testing
+        double calcSlices = (double) duration_ms / 1000D * (double) sampleRate; 
         int numberSlices = (int) calcSlices;
         //set up ByteBuffer
-        ByteBuffer bb = ByteBuffer.allocate((numberSlices * 2)); //88200 is for testing purposes
+        ByteBuffer bb = ByteBuffer.allocate((numberSlices * 2));
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.asShortBuffer();
         bb.position(0);
@@ -272,32 +260,16 @@ public class WaveTools {
      */
     public static byte[] createSilencePCM(double duration_ms, double sampleRate) {
 
-        //TODO Measure the time in profile of this method vs twiddle!
-        //SUCCESS!  This method is only 0.23 milliseconds compared to 11.6mSeconds! YAY!
-        // byte[] bytePCMsilence = new byte[(duration_ms / 1000 * sampleRate) * 2];
         ByteBuffer bb = ByteBuffer.allocate((int) (duration_ms / 1000 * sampleRate) * 2);
         bb.asShortBuffer();
         bb.position(0);
-        //System.out.println("BB limit: " + bb.limit());
-        //System.out.println((int)(sampleRate / duration_ms * 0.01));
+
         for (int slice = 0; slice < ((int) (duration_ms / 1000 * sampleRate)) - 2; slice++) {
             bb.putShort((short) 0);
-            //System.out.println("Slice: "+ slice);
-
         }
-        byte[] bytePCMsilence = new byte[(int) (duration_ms / 1000 * sampleRate) * 2];
+        byte[] bytePCMsilence;
         bytePCMsilence = bb.array();
 
-        /*        short[] shortPCMsilence = new short[(duration_ms / 1000 * sampleRate)];
-
-         for (int slice = 0; slice < (sampleRate / (duration_ms * 0.01)); slice++) {
-         shortPCMsilence[slice] = (short) 0;
-         }
-         //TODO rewrite this procedure to use ByteArrayBuffer.putShort (slice) instead of Twiddle.
-         // Current method is profiled at 11.6milliseconds using twiddle bits! (slow!)
-        
-         bytePCMsilence = ShortToByte_Twiddle_Method(shortPCMsilence);
-         */
         return bytePCMsilence;
     }
 
@@ -310,7 +282,7 @@ public class WaveTools {
      */
     public static byte[] mixTwoPCM(byte[] firstPCMwave, byte[] secondPCMwave) {
 
-        int byteLength = 0;
+        int byteLength;
 
         if (firstPCMwave.length >= secondPCMwave.length) {
             byteLength = firstPCMwave.length;
@@ -384,7 +356,7 @@ public class WaveTools {
         byte[] dahByte;
         byte[] interSpace;
         byte[] characterSPace;
-        byte[] finishByte = null;
+        byte[] finishByte;// = null;
         byte[] workingByte;
         ditByte = createSinePCM((short) 1000, (short) 100, (short) 0, 44100);
         createHannWindow(ditByte, 0.005F, sampleRate);
@@ -409,7 +381,7 @@ public class WaveTools {
         ByteBuffer pooptester = ByteBuffer.allocate(32);
         pooptester.putLong((int) unsignedInt);
 
-//TODO write simple code to output ByteArrayStream to file.  Import into Audacity and see how wave looks!
+
     }
 
 }
