@@ -166,7 +166,7 @@ public class WaveTools {
         waveBuffer.putShort((short) 1);  //1 is for PCM 2   AudioFormat      PCM = 1 (i.e. Linear quantization)
         waveBuffer.putShort(numberChannels); //2   NumChannels      Mono = 1, Stereo = 2, etc.
         writeInt(waveBuffer, sampleRate);
-        writeInt(waveBuffer, byteRate);
+        writeInt(waveBuffer, byteRate);        
         waveBuffer.putShort(blockAlign);//2   BlockAlign       == NumChannels * BitsPerSample/8
         waveBuffer.putShort(bitsPerSample);//2   BitsPerSample    8 bits = 8, 16 bits = 16, etc.
         //switch to big endian again
@@ -263,7 +263,7 @@ public class WaveTools {
         ByteBuffer bb = ByteBuffer.allocate((int) (duration_ms / 1000 * sampleRate) * 2);
         bb.asShortBuffer();
         bb.position(0);
-
+        
         for (int slice = 0; slice < ((int) (duration_ms / 1000 * sampleRate)) - 2; slice++) {
             bb.putShort((short) 0);
         }
