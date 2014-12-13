@@ -56,8 +56,9 @@ public class MorseElements {
      *
      * @param wordsPerMinute The desired speed of the morse code in words per
      * minute
-     * @param freqInHz The desired frequency of the cw tone in hertz.
-     * @param farnsworthSpacing True or False? Farnsworth spacing enabled?
+     * @param farnsWPM the desired farnsworth spaced words per minute
+     * @param freqHz The desired frequency of the cw tone in hertz.
+     * @param boolSpacing True or False? Farnsworth spacing enabled?
      */
     public MorseElements(int wordsPerMinute, int farnsWPM, boolean boolSpacing, int freqHz) {
 
