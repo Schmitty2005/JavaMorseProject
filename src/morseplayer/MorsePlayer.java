@@ -91,8 +91,8 @@ class MorsePlayer {
         int index = 0;
 
         while (index < stringLength) {
-            char charToPlay = wordToPlayLowerCase.charAt(index);
-            playChar(charToPlay);
+            char xCharToPlay = wordToPlayLowerCase.charAt(index);
+            playChar(xCharToPlay);
             System.out.println("===================");
             index++;
             //TODO remember to add code that accounts for spacing between words!

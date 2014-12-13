@@ -5,7 +5,7 @@
  */
 package morseplayer;
 // To change sample rate, you must change MorseElements.java PlayMorse.java and WaveTools.java to the same rate.  Currently at 16000 for android!
-import WavePackage.PlayByteWaveAudio;
+//import WavePackage.PlayByteWaveAudio;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -21,7 +21,7 @@ public class PlayMorse {
     int mWPM;
     //Sound_Timing timing = new Sound_Timing(18);
     private MorseElements elements = new MorseElements(32, 12, false, 800);
-    private MorseDictionary morseDict = new MorseDictionary();
+   final private MorseDictionary morseDict = new MorseDictionary();
 
     /**
      * PlayMorse wpm.
