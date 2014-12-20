@@ -7,28 +7,29 @@ package morseplayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author bill
  */
 public class MorseWave {
+
     int mWPM;
     //Sound_Timing timing = new Sound_Timing(18);
     private MorseElements elements = new MorseElements(32, 12, false, 800);
-   final private MorseDictionary morseDict = new MorseDictionary();
+    final private MorseDictionary morseDict = new MorseDictionary();
 
-    public MorseWave(MorseContainer morse_container){
-   //TODO add code to translate container into playback!
-       Sound_Timing timing = new Sound_Timing(morse_container.mWPM);
-       this.elements = new MorseElements(morse_container.mWPM, morse_container.mFarnsWPM, morse_container.mFarnsEnabled, morse_container.mFreq);
-       morse_container.waveByteArray = createMorseWave(morse_container.stringToPlay);
-       
+    public MorseWave(MorseContainer morse_container) {
+        //TODO add code to translate container into playback!
+        Sound_Timing timing = new Sound_Timing(morse_container.mWPM);
+        this.elements = new MorseElements(morse_container.mWPM, morse_container.mFarnsWPM, morse_container.mFarnsEnabled, morse_container.mFreq);
+        morse_container.waveByteArray = createMorseWave(morse_container.stringToPlay);
 
-       
-   }
-    
-private byte[] createMorseWave(String playString) {
+    }
+
+    private byte[] createMorseWave(String playString) {
 //@TODO code to play string in morse :)
         //@TODO NEEDS ByteArrayOutpuStream to work!
         ByteArrayOutputStream bbout = new ByteArrayOutputStream();
@@ -88,24 +89,27 @@ private byte[] createMorseWave(String playString) {
         byte[] header = WavePackage.WaveTools.createWaveHeaderForPcm(playWave, 16000, (short) 16);
 
         return header;
-        
+
         //WavePackage.WaveTools.saveToWaveFile(header, "firstTest.wav");
         //WavePackage.PlayByteWaveAudio player = new WavePackage.PlayByteWaveAudio(header);
-
     }
+
     public static void main(String[] args) {
-    MorseContainer mc =new MorseContainer();
-    mc.mFarnsEnabled = false;
-    mc.stringToPlay = "TEST TEST CQ CQ CQ TEST TEST TEST CQ CQ CQ";
-    mc.mWPM = 25;
-    mc.mFarnsWPM = 12;
-    mc.playContainer();
-    
-            
-            
-    //mc.playContainer();
-    
-    }
-    }
-    
+        MorseContainer mc = new MorseContainer();
+        mc.mFarnsEnabled = false;
+        mc.stringToPlay = "TEST TEST CQ CQ CQ TEST TEST TEST CQ CQ CQ";
+        mc.mWPM = 25;
+        mc.mFarnsWPM = 12;
+        mc.mFreq = 400;
 
+        mc.playContainer();
+
+        try {
+            Thread.sleep((long) 1000);
+            //mc.playContainer();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MorseWave.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+}
