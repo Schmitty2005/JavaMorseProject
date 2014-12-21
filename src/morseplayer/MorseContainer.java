@@ -13,17 +13,25 @@ package morseplayer;
  */
 public class MorseContainer {
 
-    protected int mWPM = 18;
-    protected int mFreq = 800;
-    protected boolean mFarnsEnabled = false;
-    protected int mFarnsWPM = 12;
+    public int mWPM = 18;
+    public int mFreq = 800;
+    public boolean mFarnsEnabled = false;
+    public  int mFarnsWPM = 12;
     public String stringToPlay = "";
     public byte[] waveByteArray;
     public int repeats = 1;
 
+    
     public void playContainer() {
         PlayMorse mtp = new PlayMorse(this);
 
     }
+    
+
+    public void setWave () {
+     
+
+}
+    
 
 }

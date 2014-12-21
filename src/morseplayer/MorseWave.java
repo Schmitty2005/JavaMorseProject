@@ -11,6 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *MorseWave class is made for getting the byte array wave of a programmed string.
+ * 
+ *      This can be used for android applications.  It is to get a byte array wave file of the desired string.
+ * This will allow for easy recall and playback in an android application.
  *
  * @author bill
  */
@@ -95,6 +99,7 @@ public class MorseWave {
     }
 
     public static void main(String[] args) {
+        
         MorseContainer mc = new MorseContainer();
         mc.mFarnsEnabled = false;
         mc.stringToPlay = "TEST TEST CQ CQ CQ TEST TEST TEST CQ CQ CQ";
@@ -103,6 +108,8 @@ public class MorseWave {
         mc.mFreq = 400;
 
         mc.playContainer();
+        
+        MorseWave wave = new MorseWave(mc);
 
         try {
             Thread.sleep((long) 1000);
